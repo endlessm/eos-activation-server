@@ -1,0 +1,22 @@
+{
+  "name": "eos-activation-server",
+  "version": "0.0.1",
+  "description": "Server for management of activation requests",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endlessm/eos-activation-server.git"
+  },
+  "author": "Srdjan Grubor <sgnn7@sgnn7.org>",
+  "license": "LGPL-2.1",
+  "bugs": {
+    "url": "https://github.com/endlessm/eos-activation-server/issues"
+  },
+  "homepage": "https://github.com/endlessm/eos-activation-server",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
