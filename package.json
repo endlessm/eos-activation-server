@@ -4,7 +4,7 @@
   "description": "Server for management of activation requests",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node --trace-sync-io app.js",
     "test": "./run_tests.sh"
   },
   "repository": {
