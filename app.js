@@ -8,6 +8,12 @@ var app = express();
 var LOGGING_LEVEL = 'debug';
 var HTTP_PORT = process.env.HTTP_PORT || 3000;
 
+// If we crash hard, we want to know why
+process.on('uncaughtException', function (err) {
+  winston.error(err.stack)
+  process.exit(1)
+})
+
 // We don't want to leak info out about our infrastructure
 app.disable('x-powered-by');
 
