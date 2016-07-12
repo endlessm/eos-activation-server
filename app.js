@@ -6,7 +6,7 @@ var winston = require('winston');
 var app = Express();
 
 var LOGGING_LEVEL = 'debug';
-var HTTP_PORT = 8080;
+var HTTP_PORT = process.env.HTTP_PORT || 8080;
 
 app.get('/activate', function (req, res) {
   res.send('OK');
