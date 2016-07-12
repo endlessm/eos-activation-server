@@ -15,7 +15,7 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
     apt-get install -y nodejs
 
 # TODO run process as unprivileged user
-CMD ["/opt/eos-activation-server/prod_run.sh"]
+CMD ["/opt/eos-activation-server/run_prod.sh"]
 
 ENV NODE_ENV production
 
