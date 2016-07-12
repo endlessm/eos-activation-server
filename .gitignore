@@ -1,3 +1,6 @@
+# Vim junk
+*.swp
+
 # Logs
 logs
 *.log
