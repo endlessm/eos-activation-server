@@ -17,9 +17,9 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.put('/v1/activate', function (req, res) {
+app.put('/v1/activate', (req, res) => {
   res.format({
-    'application/json': function() {
+    'application/json': () => {
       let success = true;
       let statusCode = 200;
 
@@ -47,6 +47,6 @@ app.put('/v1/activate', function (req, res) {
 });
 
 logger.info('Server starting on port ' + config.server_port + '...');
-app.listen(config.server_port, function () {
+app.listen(config.server_port, () => {
   logger.info('Server started');
 });

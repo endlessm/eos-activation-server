@@ -6,12 +6,12 @@ let request = require('supertest');
 let winston = require('winston');
 
 
-describe('Activation', function () {
+describe('Activation', () => {
   let HOST = 'localhost:3030';
 
   let goodParams;
 
-  let errorHandler = function(err, res) {
+  let errorHandler = (err, res) => {
     if (err) {
       winston.error("---------------");
       winston.error(res.status);
@@ -23,8 +23,8 @@ describe('Activation', function () {
     }
   };
 
-  describe('(v1)', function() {
-    beforeEach(function (done) {
+  describe('(v1)', () => {
+    beforeEach((done) => {
       goodParams = { image: 'image',
                      vendor: 'vendor',
                      product: 'product',
@@ -33,8 +33,8 @@ describe('Activation', function () {
       done();
     });
 
-    describe('content type', function() {
-      it('of json is accepted', function(done) {
+    describe('content type', ()  => {
+      it('of json is accepted', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('Accept', 'application/json')
@@ -43,7 +43,7 @@ describe('Activation', function () {
           .expect(200, done);
       });
 
-      it('of bad json is accepted', function(done) {
+      it('of bad json is accepted', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('Accept', 'application/json')
@@ -52,7 +52,7 @@ describe('Activation', function () {
           .expect(400, done);
       });
 
-      it('of something else is rejected', function(done) {
+      it('of something else is rejected', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('Accept', 'application/xml')
@@ -61,14 +61,14 @@ describe('Activation', function () {
       });
     });
 
-    describe('parameter test', function() {
-      it('should not fail if params are good', function(done) {
+    describe('parameter test', ()  => {
+      it('should not fail if params are good', (done) => {
         request(HOST)
           .put('/v1/activate')
           .send(goodParams)
           .expect('Content-Type', /json/)
           .expect(200)
-          .end(function(err, res) {
+          .end((err, res) => {
               errorHandler(err, res);
 
               expect(res.body).to.have.property('success');
@@ -78,7 +78,7 @@ describe('Activation', function () {
            });
       });
 
-      let parameterTest = function(done, missingParam) {
+      let parameterTest = (done, missingParam) => {
         let params = goodParams;
         delete params[missingParam];
 
@@ -87,7 +87,7 @@ describe('Activation', function () {
           .send(params)
           .expect('Content-Type', /json/)
           .expect(400)
-          .end(function(err, res) {
+          .end((err, res)  => {
               errorHandler(err, res);
 
               expect(res.body).to.have.property('success');
@@ -97,23 +97,23 @@ describe('Activation', function () {
            });
       }
 
-      it('should fail if image name is not included', function(done) {
+      it('should fail if image name is not included', (done) => {
         parameterTest(done, 'image');
       });
 
-      it('should fail if vendor name is not included', function(done) {
+      it('should fail if vendor name is not included', (done) => {
         parameterTest(done, 'vendor');
       });
 
-      it('should fail if product name is not included', function(done) {
+      it('should fail if product name is not included', (done) => {
         parameterTest(done, 'product');
       });
 
-      it('should fail if release name is not included', function(done) {
+      it('should fail if release name is not included', (done) => {
         parameterTest(done, 'release');
       });
 
-      it('should fail if live flag is not included', function(done) {
+      it('should fail if live flag is not included', (done) => {
         parameterTest(done, 'live');
       });
     });

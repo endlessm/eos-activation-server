@@ -14,7 +14,7 @@ let logger = new (winston.Logger)({
 });
 
 // Crash handler
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', (err) => {
   logger.error(err.stack);
   process.exit(1);
 })
