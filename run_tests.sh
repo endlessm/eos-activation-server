@@ -15,7 +15,7 @@ pushd $CURRENT_DIR > /dev/null
     lsof -i:$HTTP_PORT -t | xargs kill
   fi
 
-  npm start &
+  NODE_ENV=test node app.js &
   server_pid=$!
 
   # Kill server on exit
