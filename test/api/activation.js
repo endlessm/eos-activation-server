@@ -113,5 +113,30 @@ describe('Activation', () => {
         parameterTest(done, 'release');
       });
     });
+
+    describe('data persistence', ()  => {
+      //.set('X-Forwarded-For', '192.168.2.1')
+      xit('should not fail if geolocation is unknown', (done) => {
+        new Error();
+        request(HOST)
+          .put('/v1/activate')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body).to.have.property('success');
+              expect(res.body.success).to.equal(true);
+
+              done();
+           });
+      });
+
+      xit('saves correct data in the database', (done) => {});
+      xit('does not create duplicates of same serial', (done) => {});
+      xit('does not fail if there\'s no serial', (done) => {});
+      xit('stores the record creation date', (done) => {});
+    });
   });
 });
