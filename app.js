@@ -1,37 +1,10 @@
 // vim ts=2 sw=2 expandtab
 'use strict';
 
-let bodyParser = require('body-parser');
-let express = require('express');
-let winston = require('winston');
+let config = require('./config');
 
-let app = express();
-
-let LOGGING_LEVEL = 'debug';
-let HTTP_PORT = process.env.HTTP_PORT || 3000;
-
-// Set up our logger
-let loggingLevel = process.env.NODE_ENV == 'test' ? 'error' : 'info';
-let logger = new (winston.Logger)({
- transports: [
-   new (winston.transports.Console)({ level: loggingLevel })
- ]
-});
-
-// If we crash hard, we want to know why
-process.on('uncaughtException', function (err) {
-  logger.error(err.stack)
-  process.exit(1)
-})
-
-// We don't want to leak info out about our infrastructure
-app.disable('x-powered-by');
-
-// Parse JSON
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+let logger = config.logger;
+let app = config.app;
 
 app.put('/v1/activate', function (req, res) {
   res.format({
@@ -51,7 +24,7 @@ app.put('/v1/activate', function (req, res) {
 
       res.status(statusCode)
          .json({
-           success: success
+             success: success
          });
     },
 
@@ -62,8 +35,7 @@ app.put('/v1/activate', function (req, res) {
   });
 });
 
-logger.info('Server starting on port ' + HTTP_PORT + '...');
-
-app.listen(HTTP_PORT, function () {
+logger.info('Server starting on port ' + config.server_port + '...');
+app.listen(config.server_port, function () {
   logger.info('Server started');
 });

@@ -37,11 +37,19 @@ describe('Activation', function () {
       it('of json is accepted', function(done) {
         request(HOST)
           .put('/v1/activate')
-          .send(goodParams)
           .set('Accept', 'application/json')
           .send(goodParams)
           .expect('Content-Type', /json/)
           .expect(200, done);
+      });
+
+      it('of bad json is accepted', function(done) {
+        request(HOST)
+          .put('/v1/activate')
+          .set('Accept', 'application/json')
+          .send("bacd")
+          .expect('Content-Type', /json/)
+          .expect(400, done);
       });
 
       it('of something else is rejected', function(done) {
