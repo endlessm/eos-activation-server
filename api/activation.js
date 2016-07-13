@@ -2,12 +2,13 @@
 'use strict';
 
 const express = require('express');
-const router = express.Router();
+const geoip = require('geoip-lite');
 
 const Validator = require('jsonschema').Validator;
 
 const activation = (router, logger) => {
   const validator = new Validator();
+
   const activation_schema = {
     'type': 'object',
     'properties': {
@@ -27,8 +28,7 @@ const activation = (router, logger) => {
         let success = true;
         let statusCode = 200;
 
-        let ip = req.ip; //TODO: req.ips
-
+        // Validate things
         const validationResult = validator.validate(req.body, activation_schema)
         if (validationResult.errors.length > 0) {
           logger.warn("Request failed schema validation!");
@@ -39,6 +39,10 @@ const activation = (router, logger) => {
           success = false;
           statusCode = 400;
         }
+
+        // Get geolocation
+        const ip = req.ip; //TODO: req.ips
+        logger.warn(geoip.lookup(ip));
 
         res.status(statusCode)
            .json({ success: success });
