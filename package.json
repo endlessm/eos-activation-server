@@ -22,6 +22,7 @@
     "chai": "^3.5.0",
     "express": "^4.14.0",
     "geoip-lite": "^1.1.8",
+    "i18n-iso-countries": "^1.2.1",
     "jsonschema": "^1.1.0",
     "mocha": "^2.5.3",
     "mocha-jenkins-reporter": "^0.2.3",
