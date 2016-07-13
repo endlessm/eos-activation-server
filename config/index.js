@@ -2,8 +2,6 @@
 'use strict';
 
 let winston = require('winston');
-let bodyParser = require('body-parser');
-let express = require('express');
 
 let server_port = process.env.HTTP_PORT || 3000;
 
@@ -21,20 +19,7 @@ process.on('uncaughtException', function (err) {
   process.exit(1);
 })
 
-let app = express();
-
-// We don't want to leak info out about our infrastructure
-app.disable('x-powered-by');
-
-// Parse JSON
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-
-
-exports = module.exports = {};
-
-exports.logger = logger;
-exports.server_port = server_port;
-exports.app = app;
+exports = module.exports = {
+  logger: logger,
+  server_port: server_port
+};

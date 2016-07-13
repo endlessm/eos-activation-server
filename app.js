@@ -1,10 +1,21 @@
 // vim ts=2 sw=2 expandtab
 'use strict';
 
+let bodyParser = require('body-parser');
 let config = require('./config');
+let express = require('express');
 
 let logger = config.logger;
-let app = config.app;
+let app = express();
+
+// We don't want to leak info out about our infrastructure
+app.disable('x-powered-by');
+
+// Parse JSON
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 app.put('/v1/activate', function (req, res) {
   res.format({
