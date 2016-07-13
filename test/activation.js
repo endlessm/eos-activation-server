@@ -1,14 +1,17 @@
-var expect = require('chai').expect;
-var request = require('supertest');
-var winston = require('winston');
+// vim ts=2 sw=2 expandtab
+'use strict';
+
+let expect = require('chai').expect;
+let request = require('supertest');
+let winston = require('winston');
 
 
 describe('Activation', function () {
-  var HOST = 'localhost:3030';
+  let HOST = 'localhost:3030';
 
-  var goodParams;
+  let goodParams;
 
-  var errorHandler = function(err, res) {
+  let errorHandler = function(err, res) {
     if (err) {
       winston.error("---------------");
       winston.error(res.status);
@@ -67,9 +70,9 @@ describe('Activation', function () {
            });
       });
 
-      it('should fail if image name is not included', function(done) {
-        var params = goodParams;
-        delete params['image'];
+      let parameterTest = function(done, missingParam) {
+        let params = goodParams;
+        delete params[missingParam];
 
         request(HOST)
           .put('/v1/activate')
@@ -84,25 +87,26 @@ describe('Activation', function () {
 
               done();
            });
+      }
+
+      it('should fail if image name is not included', function(done) {
+        parameterTest(done, 'image');
       });
 
       it('should fail if vendor name is not included', function(done) {
-        var params = goodParams;
-        delete params['vendor'];
+        parameterTest(done, 'vendor');
+      });
 
-        request(HOST)
-          .put('/v1/activate')
-          .send(params)
-          .expect('Content-Type', /json/)
-          .expect(400)
-          .end(function(err, res) {
-              errorHandler(err, res);
+      it('should fail if product name is not included', function(done) {
+        parameterTest(done, 'product');
+      });
 
-              expect(res.body).to.have.property('success');
-              expect(res.body.success).to.equal(false);
+      it('should fail if release name is not included', function(done) {
+        parameterTest(done, 'release');
+      });
 
-              done();
-           });
+      it('should fail if live flag is not included', function(done) {
+        parameterTest(done, 'live');
       });
     });
   });
