@@ -21,6 +21,7 @@
     "body-parser": "^1.15.2",
     "chai": "^3.5.0",
     "express": "^4.14.0",
+    "jsonschema": "^1.1.0",
     "mocha": "^2.5.3",
     "mocha-jenkins-reporter": "^0.2.3",
     "pm2": "^1.1.3",

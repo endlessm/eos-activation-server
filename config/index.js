@@ -1,13 +1,13 @@
 // vim ts=2 sw=2 expandtab
 'use strict';
 
-let winston = require('winston');
+const winston = require('winston');
 
-let server_port = process.env.HTTP_PORT || 3000;
+const server_port = process.env.HTTP_PORT || 3000;
 
 // Logger config
-let loggingLevel = process.env.NODE_ENV == 'test' ? 'error' : 'info';
-let logger = new (winston.Logger)({
+const loggingLevel = process.env.NODE_ENV == 'test' ? 'error' : 'info';
+const logger = new (winston.Logger)({
  transports: [
    new (winston.transports.Console)({ level: loggingLevel })
  ]

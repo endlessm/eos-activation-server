@@ -7,11 +7,11 @@ let winston = require('winston');
 
 
 describe('Activation', () => {
-  let HOST = 'localhost:3030';
+  const HOST = 'localhost:3030';
 
   let goodParams;
 
-  let errorHandler = (err, res) => {
+  const errorHandler = (err, res) => {
     if (err) {
       winston.error("---------------");
       winston.error(res.status);
@@ -43,7 +43,7 @@ describe('Activation', () => {
           .expect(200, done);
       });
 
-      it('of bad json is accepted', (done) => {
+      it('of bad json is not accepted', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('Accept', 'application/json')
@@ -62,7 +62,7 @@ describe('Activation', () => {
     });
 
     describe('parameter test', ()  => {
-      it('should not fail if params are good', (done) => {
+      it('should not fail if full params are good', (done) => {
         request(HOST)
           .put('/v1/activate')
           .send(goodParams)
@@ -78,7 +78,7 @@ describe('Activation', () => {
            });
       });
 
-      let parameterTest = (done, missingParam) => {
+      const parameterTest = (done, missingParam) => {
         let params = goodParams;
         delete params[missingParam];
 
@@ -111,10 +111,6 @@ describe('Activation', () => {
 
       it('should fail if release name is not included', (done) => {
         parameterTest(done, 'release');
-      });
-
-      it('should fail if live flag is not included', (done) => {
-        parameterTest(done, 'live');
       });
     });
   });

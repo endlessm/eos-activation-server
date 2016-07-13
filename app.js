@@ -1,14 +1,14 @@
 // vim ts=2 sw=2 expandtab
 'use strict';
 
-let bodyParser = require('body-parser');
-let express = require('express');
+const bodyParser = require('body-parser');
+const express = require('express');
 
-let api = require('./api');
-let config = require('./config');
+const api = require('./api');
+const config = require('./config');
 
-let app = express();
-let logger = config.logger;
+const app = express();
+const logger = config.logger;
 
 app.disable('x-powered-by');
 
