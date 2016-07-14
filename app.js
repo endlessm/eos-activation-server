@@ -19,7 +19,9 @@ app.use(bodyParser.urlencoded({
 
 app.use(api.router);
 
-logger.info('Server starting on port ' + config.server_port + '...');
-app.listen(config.server_port, () => {
+logger.info('Server starting on ' +
+             config.server_bind_address + ':' + config.server_port + '...');
+
+app.listen(config.server_port, config.server_bind_address, () => {
   logger.info('Server started');
 });

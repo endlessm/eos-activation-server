@@ -5,7 +5,6 @@ let expect = require('chai').expect;
 let request = require('supertest');
 let winston = require('winston');
 
-
 describe('Activation', () => {
   const HOST = 'localhost:3030';
 
