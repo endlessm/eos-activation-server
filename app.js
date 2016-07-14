@@ -19,6 +19,22 @@ app.use(bodyParser.urlencoded({
 
 app.use(api.router);
 
+// Error handler
+app.use((err, req, res, next) => {
+  if (err) {
+    logger.error(err);
+
+    let errorMessage = "Server error";
+    if (process.env.NODE_ENV == 'test') {
+      errorMessage = err.toString() + '\n' + err.stack;
+    }
+
+    res.status(500)
+       .json({ error: errorMessage,
+               success: false });
+  }
+});
+
 logger.info('Server starting on ' +
              config.server_bind_address + ':' + config.server_port + '...');
 

@@ -45,11 +45,12 @@ pushd $CURRENT_DIR > /dev/null
     # trap "$PM2 stop -s eos-activation-server || true" EXIT
   fi
 
-  # Wait for server to come up
+  echo "Waiting for server to come up..."
   while [ "$(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".3030"')" == "" ]; do
     sleep 0.05
   done
 
+  echo "Running tests..."
   if [ "$JENKINS_OUTPUT" == "true" ]; then
     rm -f reports/*.xml
 

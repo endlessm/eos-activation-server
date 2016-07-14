@@ -1,0 +1,6 @@
+{ "image": "image",
+  "vendor": "vendor",
+  "product": "product",
+  "release": "release",
+  "serial": "serial",
+  "live": true }

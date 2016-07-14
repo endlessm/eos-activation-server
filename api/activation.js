@@ -4,6 +4,8 @@
 const express = require('express');
 const geoip = require('geoip-lite');
 
+const db = require('../db');
+
 const Validator = require('jsonschema').Validator;
 
 const activation = (router, logger) => {
@@ -48,10 +50,30 @@ const activation = (router, logger) => {
 
         // Get geolocation
         const ip = req.ip; //TODO: req.ips
-        logger.warn(geoip.lookup(ip));
+        const geoLookup = geoip.lookup(ip);
+        if (geoLookup) {
+          logger.info(geoLookup);
+        }
 
-        res.status(200)
-           .json({ success: true });
+        db.Activation.upsert(req.body).then((activation) => {
+          logger.debug("Saved:");
+          logger.debug(activation);
+
+          res.status(200)
+             .json({ success: true });
+        });
+        /*
+        }).catch((err) => {
+          logger.error(err);
+
+          // TODO: Test me
+          res.status(500)
+             .json({ error: err.toString(),
+                     success: false });
+
+          throw err;
+        });
+        */
       },
 
       'default': () => {
