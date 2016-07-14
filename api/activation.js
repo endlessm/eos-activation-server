@@ -1,4 +1,4 @@
-// vim ts=2 sw=2 expandtab
+// vim: ts=2 sw=2 expandtab
 'use strict';
 
 const express = require('express');
@@ -12,14 +12,17 @@ const activation = (router, logger) => {
   const activation_schema = {
     'type': 'object',
     'properties': {
-      'image': { 'type': 'string' },
-      'vendor': { 'type': 'string' },
+      'image':   { 'type': 'string' },
+      'vendor':  { 'type': 'string' },
       'product': { 'type': 'string' },
-      'serial': { 'type': 'string' },
+      'serial':  { 'type': 'string' },
       'release': { 'type': 'string' },
-      'live': { 'type': 'boolean' }
+      'live':    { 'type': 'boolean' }
     },
-    'required': ['image', 'vendor', 'product', 'release']
+    'required': ['image',
+                 'vendor',
+                 'product',
+                 'release']
   }
 
   router.put('/v1/activate', (req, res) => {

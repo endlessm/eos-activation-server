@@ -1,4 +1,4 @@
-// vim ts=2 sw=2 expandtab
+// vim: ts=2 sw=2 expandtab
 'use strict';
 
 let expect = require('chai').expect;
@@ -134,6 +134,7 @@ describe('Activation', () => {
       });
 
       xit('saves correct data in the database', (done) => {});
+      xit('saves the 3-letter country code instead of the 2-letter one', (done) => {});
       xit('does not create duplicates of same serial', (done) => {});
       xit('does not fail if there\'s no serial', (done) => {});
       xit('stores the record creation date', (done) => {});
