@@ -4,6 +4,7 @@
 let expect = require('chai').expect;
 let request = require('supertest');
 let winston = require('winston');
+
 let db = require('../../db');
 
 describe('Activation', () => {
@@ -117,13 +118,7 @@ describe('Activation', () => {
       });
     });
 
-    describe('data persistence', ()  => {
-      beforeEach((done) => {
-        db.Activation.sync({ force : true }).then(() => {
-          done();
-        });
-      });
-
+    describe('geolocation', ()  => {
       it('should not fail if geolocation is unknown', (done) => {
         request(HOST)
           .put('/v1/activate')
@@ -139,6 +134,28 @@ describe('Activation', () => {
 
               done();
            });
+      });
+    });
+
+    describe('data persistence', ()  => {
+      let image =   'image '   + Math.random();
+      let vendor =  'vendor '  + Math.random();
+      let product = 'product ' + Math.random();
+      let release = 'release ' + Math.random();
+      let serial =  'serial '  + Math.random();
+      let live = Math.random() > 0.5 ? true : false;
+
+      beforeEach((done) => {
+        goodParams = { image: image,
+                       vendor: vendor,
+                       product: product,
+                       release: release,
+                       serial: serial,
+                       live: live };
+
+        db.Activation.sync({ force : true }).then(() => {
+          done();
+        });
       });
 
       it('saves correct data in the database', (done) => {
@@ -156,12 +173,12 @@ describe('Activation', () => {
               db.Activation.findAndCountAll().then((result) => {
                 expect(result.count).to.equal(1);
                 expect(result.rows[0]).to.eql({
-                  image: 'image',
-                  vendor: 'vendor',
-                  product: 'product',
-                  serial: 'serial',
-                  release: 'release',
-                  live: 'true',
+                  image: image,
+                  vendor: vendor,
+                  product: product,
+                  serial: serial,
+                  release: release,
+                  live: live,
                   country: 'country',
                   region: 'region',
                   city: 'city',

@@ -18,7 +18,7 @@ db.Activation = {
       product: 'product',
       serial: 'serial',
       release: 'release',
-      live: 'true',
+      live: true,
       country: 'country',
       region: 'region',
       city: 'city',
