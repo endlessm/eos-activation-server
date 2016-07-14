@@ -163,7 +163,7 @@ describe('Activation', () => {
         });
       });
 
-      xit('saves correct data in the database', (done) => {
+      it('saves correct data in the database', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')

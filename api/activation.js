@@ -52,12 +52,13 @@ const activation = (router, logger) => {
         const ip = req.ip; //TODO: req.ips
         const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
+          logger.info("Geo:");
           logger.info(geoLookup);
         }
 
         db.Activation.upsert(req.body).then((activation) => {
-          logger.debug("Saved:");
-          logger.debug(activation);
+          logger.info("Activation saved:");
+          logger.info(activation);
 
           res.status(200)
              .json({ success: true });
