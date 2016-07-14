@@ -93,6 +93,9 @@ describe('Activation', () => {
               expect(res.body).to.have.property('success');
               expect(res.body.success).to.equal(false);
 
+              expect(res.body).to.have.property('error');
+              expect(res.body.error).to.equal('Request failed schema validation');
+
               done();
            });
       }

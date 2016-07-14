@@ -39,16 +39,19 @@ const activation = (router, logger) => {
             logger.debug(" - " + errorMesage);
           }
 
-          success = false;
-          statusCode = 400;
+          res.status(400)
+             .json({ error: "Request failed schema validation",
+                     success: false });
+
+          return;
         }
 
         // Get geolocation
         const ip = req.ip; //TODO: req.ips
         logger.warn(geoip.lookup(ip));
 
-        res.status(statusCode)
-           .json({ success: success });
+        res.status(200)
+           .json({ success: true });
       },
 
       'default': () => {
