@@ -4,6 +4,7 @@
 let expect = require('chai').expect;
 let request = require('supertest');
 let winston = require('winston');
+let db = require('../../db');
 
 describe('Activation', () => {
   const HOST = 'localhost:3030';
@@ -117,11 +118,16 @@ describe('Activation', () => {
     });
 
     describe('data persistence', ()  => {
-      //.set('X-Forwarded-For', '192.168.2.1')
-      xit('should not fail if geolocation is unknown', (done) => {
-        new Error();
+      beforeEach((done) => {
+        db.Activation.sync({ force : true }).then(() => {
+          done();
+        });
+      });
+
+      it('should not fail if geolocation is unknown', (done) => {
         request(HOST)
           .put('/v1/activate')
+          .set('X-Forwarded-For', '127.0.0.1')
           .send(goodParams)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -135,7 +141,38 @@ describe('Activation', () => {
            });
       });
 
-      xit('saves correct data in the database', (done) => {});
+      it('saves correct data in the database', (done) => {
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Activation.findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+                expect(result.rows[0]).to.eql({
+                  image: 'image',
+                  vendor: 'vendor',
+                  product: 'product',
+                  serial: 'serial',
+                  release: 'release',
+                  live: 'true',
+                  country: 'country',
+                  region: 'region',
+                  city: 'city',
+                  coordinates: [12.345, 67.890],
+                });
+
+                done();
+              });
+           });
+      });
+
       xit('saves the 3-letter country code instead of the 2-letter one', (done) => {});
       xit('does not create duplicates of same serial', (done) => {});
       xit('does not fail if there\'s no serial', (done) => {});
