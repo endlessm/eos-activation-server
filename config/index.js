@@ -14,6 +14,7 @@ process.on('uncaughtException', (err) => {
 });
 
 exports = module.exports = {
+  env: process.env.NODE_ENV,
   logger: logger,
   server_port: server_port,
   server_bind_address: server_bind_address

@@ -31,6 +31,7 @@ const db = {
 
     let stringData = JSON.stringify(data);
     logger.silly(stringData);
+
     fs.writeFileSync('./tmp/mockdb_' + name.toLowerCase() +'.json', stringData, 'utf8');
   }
 };
@@ -40,7 +41,8 @@ db.Activation = {
     return db._readDb('Activation');
   },
   sync: (params) => {
-    logger.info("Clearing the DB");
+    logger.silly("Clearing the DB");
+
     db.Activation._db().length = 0;
     db._writeDb('Activation', []);
 
@@ -51,13 +53,16 @@ db.Activation = {
   upsert: (object) => {
     logger.silly("Upserted");
     logger.silly(db.Activation._db());
+
     let new_data = db.Activation._db();
     new_data.push(object);
+
     db._writeDb('Activation', new_data);
 
     logger.silly("Current item count: " + db.Activation._db().length);
 
     const saved_object = db.Activation._db().slice(-1)[0];
+
     logger.silly("Upsert saved");
     logger.silly(saved_object);
 

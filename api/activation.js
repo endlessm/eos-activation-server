@@ -48,15 +48,23 @@ const activation = (router, logger) => {
           return;
         }
 
+        let activation = req.body;
+
         // Get geolocation
-        const ip = req.ip; //TODO: req.ips
-        const geoLookup = geoip.lookup(ip);
+        // TODO: req.ips
+        const geoLookup = geoip.lookup(req.ip);
         if (geoLookup) {
           logger.info("Geo:");
           logger.info(geoLookup);
+
+          // XXX: Merge was overkill since 'll' needed a name change
+          activation.country = geoLookup.country;
+          activation.region = geoLookup.region;
+          activation.city = geoLookup.city;
+          activation.coordinates = geoLookup.ll;
         }
 
-        db.Activation.upsert(req.body).then((activation) => {
+        db.Activation.upsert(activation).then((activation) => {
           logger.info("Activation saved:");
           logger.info(activation);
 

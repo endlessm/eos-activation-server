@@ -167,6 +167,7 @@ describe('Activation', () => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
+          .set('Remote-Addr', '192.168.2.1')
           .send(goodParams)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -184,10 +185,10 @@ describe('Activation', () => {
                   serial: serial,
                   release: release,
                   live: live,
-                  country: 'country',
-                  region: 'region',
-                  city: 'city',
-                  coordinates: [12.345, 67.890],
+                  country: 'US',
+                  region: 'CA',
+                  city: 'San Francisco',
+                  coordinates: [37.7758, -122.4128],
                 });
 
                 done();

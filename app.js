@@ -17,6 +17,11 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+// XXX: For tests we need to be able to spoof IPs
+if (config.env == 'test') {
+  app.enable('trust proxy');
+}
+
 app.use(api.router);
 
 // Error handler
