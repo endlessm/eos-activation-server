@@ -1,6 +1,11 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
+// XXX: Hack so that we don't require setting of env var on each run
+//      Upstream: https://github.com/mochajs/mocha/issues/185
+
+process.env.NODE_ENV = 'test';
+
 const expect = require('chai').expect;
 const request = require('supertest');
 const winston = require('winston');
