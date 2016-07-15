@@ -1,6 +1,7 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
+const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
 
@@ -57,10 +58,12 @@ const activation = (router, logger) => {
           logger.info("Geo:");
           logger.info(geoLookup);
 
-          // XXX: Merge was overkill since 'll' needed a name change
-          activation.country = geoLookup.country;
+          // Store 3-letter code vs 2-letter one since vendor wants it that way
+          activation.country = countries.alpha2ToAlpha3(geoLookup.country);
           activation.region = geoLookup.region;
           activation.city = geoLookup.city;
+
+          // XXX: Merge was overkill since 'll' needed a name change
           activation.coordinates = geoLookup.ll;
         }
 

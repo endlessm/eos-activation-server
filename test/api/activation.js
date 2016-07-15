@@ -167,7 +167,6 @@ describe('Activation', () => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
-          .set('Remote-Addr', '192.168.2.1')
           .send(goodParams)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -185,7 +184,7 @@ describe('Activation', () => {
                   serial: serial,
                   release: release,
                   live: live,
-                  country: 'US',
+                  country: 'USA',
                   region: 'CA',
                   city: 'San Francisco',
                   coordinates: [37.7758, -122.4128],
@@ -196,7 +195,27 @@ describe('Activation', () => {
            });
       });
 
-      xit('saves the 3-letter country code instead of the 2-letter one', (done) => {});
+      it('saves the 3-letter country code instead of the 2-letter one', (done) => {
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Activation.findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+                expect(result.rows[0].country).to.eql('USA');
+
+                done();
+              });
+           });
+      });
+
       xit('does not create duplicates of same serial', (done) => {});
       xit('does not fail if there\'s no serial', (done) => {});
       xit('stores the record creation date', (done) => {});
