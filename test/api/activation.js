@@ -217,7 +217,35 @@ describe('Activation', () => {
       });
 
       xit('does not create duplicates of same serial', (done) => {});
-      xit('does not fail if there\'s no serial', (done) => {});
+
+      it('does not fail if there\'s no serial', (done) => {
+        delete goodParams.serial;
+        expect(goodParams).to.not.have.property('serial');
+
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Activation.findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+                for (let prop in goodParams) {
+                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
+                }
+
+                expect(res.body).to.not.have.property('serial');
+
+                done();
+              });
+           });
+      });
+
       xit('stores the record creation date', (done) => {});
     });
   });
