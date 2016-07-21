@@ -25,13 +25,12 @@ pushd $CURRENT_DIR > /dev/null
     server_pid=$!
     trap "kill $server_pid &>/dev/null || true" EXIT
   else
-    if [ "$($PM2 info  eos-activation-server --no-color | grep status | grep online)" == "" ]; then
+    if [ "$($PM2 info eos-activation-server --no-color | grep status | grep online)" == "" ]; then
       $PM2 --watch . \
-           --ignore-watch "\.git ^test" \
+           --ignore-watch "\.git ^test tmp" \
            -i 1 \
            -n eos-activation-server \
            start ./app.js
-
 
       # XXX: Inline debugging if you find issues with the tests
       # $PM2 logs eos-activation-server &
