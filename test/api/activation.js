@@ -6,6 +6,9 @@
 
 process.env.NODE_ENV = 'test';
 
+const chai = require('chai');
+chai.use(require('chai-datetime'));
+
 const expect = require('chai').expect;
 const request = require('supertest');
 const winston = require('winston');
@@ -20,6 +23,8 @@ describe('Activation', () => {
   const errorHandler = (err, res) => {
     if (err) {
       winston.error("---------------");
+      winston.error(err);
+      winston.error(res);
       winston.error(res.status);
       winston.error(res.headers);
       winston.error(res.body);
@@ -28,6 +33,12 @@ describe('Activation', () => {
       throw err;
     }
   };
+
+  const isExpectedDate = (dateString) => {
+    var savedDate = new Date(dateString);
+    return Math.abs(savedDate - new Date()) < 1000;
+  };
+
 
   describe('(v1)', () => {
     beforeEach((done) => {
@@ -177,18 +188,25 @@ describe('Activation', () => {
 
               db.Activation.findAndCountAll().then((result) => {
                 expect(result.count).to.equal(1);
-                expect(result.rows[0]).to.eql({
-                  image: image,
-                  vendor: vendor,
-                  product: product,
-                  serial: serial,
-                  release: release,
-                  live: live,
-                  country: 'USA',
-                  region: 'CA',
-                  city: 'San Francisco',
-                  coordinates: [37.7758, -122.4128],
-                });
+
+                const activationRecord = result.rows[0];
+                for (let prop in goodParams) {
+                  expect(activationRecord[prop]).to.eql(goodParams[prop]);
+                }
+
+                expect(activationRecord).to.have.property('createdAt');
+                expect(activationRecord).to.have.property('updatedAt');
+                expect(activationRecord).to.have.property('country');
+                expect(activationRecord).to.have.property('region');
+                expect(activationRecord).to.have.property('city');
+                expect(activationRecord).to.have.property('coordinates');
+
+                expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
+                expect(activationRecord.country).to.equal('USA');
+                expect(activationRecord.region).to.equal('CA');
+                expect(activationRecord.city).to.equal('San Francisco');
+                expect(activationRecord.coordinates).to.eql([37.7758, -122.4128]);
 
                 done();
               });
@@ -235,6 +253,7 @@ describe('Activation', () => {
 
               db.Activation.findAndCountAll().then((result) => {
                 expect(result.count).to.equal(1);
+
                 for (let prop in goodParams) {
                   expect(result.rows[0][prop]).to.eql(goodParams[prop]);
                 }
@@ -246,7 +265,38 @@ describe('Activation', () => {
            });
       });
 
-      xit('stores the record creation date', (done) => {});
+      it('stores the record creation date', (done) => {
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Activation.findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+
+                for (let prop in goodParams) {
+                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
+                }
+
+                var timeAfterRequest = new Date();
+                timeAfterRequest.setMinutes(timeAfterRequest.getMinutes() + 1);
+
+                expect(result.rows[0]).to.have.property('createdAt');
+                expect(result.rows[0]).to.have.property('updatedAt');
+
+                expect(isExpectedDate(new Date(result.rows[0].createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(result.rows[0].updatedAt))).to.equal(true);
+
+                done();
+              });
+           });
+      });
     });
   });
 });

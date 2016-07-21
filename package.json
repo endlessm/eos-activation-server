@@ -20,6 +20,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "chai": "^3.5.0",
+    "chai-datetime": "^1.4.1",
     "express": "^4.14.0",
     "geoip-lite": "^1.1.8",
     "i18n-iso-countries": "^1.2.1",

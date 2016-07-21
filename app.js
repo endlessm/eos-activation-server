@@ -44,5 +44,5 @@ logger.info('Server starting on ' +
              config.server_bind_address + ':' + config.server_port + '...');
 
 app.listen(config.server_port, config.server_bind_address, () => {
-  logger.info('Server started');
+  logger.info('Server started (' + process.env.NODE_ENV + ')');
 });

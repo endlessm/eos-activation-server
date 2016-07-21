@@ -55,6 +55,8 @@ db.Activation = {
     logger.silly(db.Activation._db());
 
     let new_data = db.Activation._db();
+    object.createdAt = new Date();
+    object.updatedAt = new Date();
     new_data.push(object);
 
     db._writeDb('Activation', new_data);

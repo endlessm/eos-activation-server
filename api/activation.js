@@ -32,7 +32,6 @@ const activation = (router, logger) => {
     res.format({
       'application/json': () => {
         let success = true;
-        let statusCode = 200;
 
         // Validate things
         const validationResult = validator.validate(req.body, activation_schema)
