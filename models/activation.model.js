@@ -1,6 +1,8 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
+// TODO: INDEXES!!!
+
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('Activation', {
     id: {
@@ -24,6 +26,6 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     paranoid: false,
     freezeTableName: true,
-    tableName: 'activation',
+    tableName: 'activation'
   });
 };

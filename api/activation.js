@@ -68,22 +68,48 @@ const activation = (router, logger) => {
           }
         }
 
-        db.Activation.upsert(activation)
-                     .then((activation) => {
-          logger.info("Activation saved:");
-          logger.info(activation);
+        const insertActivationRecord = (record) => {
+          db.Activation.upsert(activation)
+                       .then((activation) => {
+            logger.info("Activation saved:");
+            logger.info(activation);
 
-          res.status(200)
-             .json({ success: true });
-        }).catch((err) => {
-          logger.error(err);
+            res.status(200)
+               .json({ success: true });
+          }).catch((err) => {
+            logger.error(err);
 
-          res.status(500)
-             .json({ error: err.toString(),
-                     success: false });
+            res.status(500)
+               .json({ error: err.toString(),
+                       success: false });
 
-          throw err;
-        });
+            throw err;
+          });
+        }
+
+        if (activation.serial) {
+          db.Activation.findOne({ where: { serial: activation.serial }})
+            .then((record) => {
+              if (record) {
+                logger.error("Found!");
+                res.status(409)
+                   .json({ error: "Serial already activated! Ignoring!",
+                           success: false });
+
+              } else {
+                insertActivationRecord(activation);
+              }
+            })
+            .catch((err) => {
+                res.status(304)
+                   .json({ error: "Serial already activated!",
+                           success: true });
+            });
+
+            return;
+        }
+
+        insertActivationRecord(activation);
       },
 
       'default': () => {

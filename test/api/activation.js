@@ -10,7 +10,7 @@ const chai = require('chai');
 chai.use(require('chai-datetime'));
 
 const expect = require('chai').expect;
-const request = require('supertest');
+const request = require("supertest-as-promised");
 const winston = require('winston');
 
 const db = require('../../db');
@@ -24,13 +24,15 @@ describe('Activation', () => {
     if (err) {
       winston.error("---------------");
       winston.error(err);
-      winston.error(res);
-      winston.error(res.status);
-      winston.error(res.headers);
-      winston.error(res.body);
-      winston.error("---------------");
 
-      throw err;
+      if (res) {
+        winston.error(res);
+        winston.error(res.status);
+        winston.error(res.headers);
+        winston.error(res.body);
+      }
+
+      winston.error("---------------");
     }
   };
 
@@ -236,7 +238,42 @@ describe('Activation', () => {
            });
       });
 
-      xit('does not create duplicates of same serial', (done) => {});
+      it('does not create duplicates of same serial', (done) => {
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then((res) => {
+             expect(res.body.success).to.equal(true);
+
+             return request(HOST)
+               .put('/v1/activate')
+               .set('X-Forwarded-For', '204.28.125.53')
+               .send(goodParams)
+               .expect('Content-Type', /json/)
+               .expect(409);
+          })
+          .then((res) => {
+             db.Activation.findAndCountAll()
+               .then((result) => {
+                 expect(result.count).to.equal(1);
+                 expect(result.rows[0].serial).to.eql(serial);
+
+                 done();
+               })
+               .catch((err) => {
+                 errorHandler(err);
+
+                 done(err);
+               });
+          })
+          .catch((err, res) => {
+             errorHandler(err, res);
+             done(err);
+          });
+      });
 
       it('does not fail if there\'s no serial', (done) => {
         delete goodParams.serial;
