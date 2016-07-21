@@ -4,9 +4,10 @@
 let db;
 
 if (process.env.NODE_ENV == 'test') {
-  db = require('./mockDb');
+  // db = require('./mockDb');
+  db = require('./sqlDb');
 } else {
-  throw Error("We don't have a real database hooked up!");
+  db = require('./sqlDb');
 }
 
 exports = module.exports = db;

@@ -68,25 +68,22 @@ const activation = (router, logger) => {
           }
         }
 
-        db.Activation.upsert(activation).then((activation) => {
+        db.Activation.upsert(activation)
+                     .then((activation) => {
           logger.info("Activation saved:");
           logger.info(activation);
 
           res.status(200)
              .json({ success: true });
-        });
-        /*
         }).catch((err) => {
           logger.error(err);
 
-          // TODO: Test me
           res.status(500)
              .json({ error: err.toString(),
                      success: false });
 
           throw err;
         });
-        */
       },
 
       'default': () => {
