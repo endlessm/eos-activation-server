@@ -199,14 +199,16 @@ describe('Activation', () => {
                 expect(activationRecord).to.have.property('country');
                 expect(activationRecord).to.have.property('region');
                 expect(activationRecord).to.have.property('city');
-                expect(activationRecord).to.have.property('coordinates');
+                expect(activationRecord).to.have.property('latitude');
+                expect(activationRecord).to.have.property('longitude');
 
                 expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
                 expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
                 expect(activationRecord.country).to.equal('USA');
                 expect(activationRecord.region).to.equal('CA');
                 expect(activationRecord.city).to.equal('San Francisco');
-                expect(activationRecord.coordinates).to.eql([37.7758, -122.4128]);
+                expect(activationRecord.latitude).to.eql(37.7758);
+                expect(activationRecord.longitude).to.eql(-122.4128);
 
                 done();
               });

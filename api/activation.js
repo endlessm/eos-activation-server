@@ -62,8 +62,10 @@ const activation = (router, logger) => {
           activation.region = geoLookup.region;
           activation.city = geoLookup.city;
 
-          // XXX: Merge was overkill since 'll' needed a name change
-          activation.coordinates = geoLookup.ll;
+          if (geoLookup.ll) {
+            activation.latitude = geoLookup.ll[0];
+            activation.longitude = geoLookup.ll[1];
+          }
         }
 
         db.Activation.upsert(activation).then((activation) => {
