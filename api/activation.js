@@ -30,13 +30,11 @@ const activation = (router, logger) => {
   }
 
   const insertActivationRecord = (res, record) => {
-    logger.info("Activation attempt:");
-    logger.info(record);
+    logger.info('Activation attempt:', record);
 
     db.Activation.upsert(record)
                  .then((ingestedRecord) => {
-      logger.info("Activation saved:");
-      logger.info(record);
+      logger.info('Activation saved:', record);
 
       activationHooks(record);
 
@@ -79,8 +77,7 @@ const activation = (router, logger) => {
         // TODO: req.ips
         const geoLookup = geoip.lookup(req.ip);
         if (geoLookup) {
-          logger.info("Geo:");
-          logger.info(geoLookup);
+          logger.info('Geo:', geoLookup);
 
           // Store 3-letter code vs 2-letter one since vendor wants it that way
           activation.country = countries.alpha2ToAlpha3(geoLookup.country);
@@ -100,7 +97,7 @@ const activation = (router, logger) => {
               if (record) {
                 logger.error('Found!');
                 res.status(409)
-                   .json({ error: 'Serial "' + record + '" already activated! Ignoring!',
+                   .json({ error: 'Serial "' + record.serial + '" already activated! Ignoring!',
                            success: false });
 
               } else {
