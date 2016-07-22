@@ -33,7 +33,8 @@ const db = {
     logger.silly(stringData);
 
     fs.writeFileSync('./tmp/mockdb_' + name.toLowerCase() +'.json', stringData, 'utf8');
-  }
+  },
+  catchFunc: { catch: (func) => {} }
 };
 
 db.Activation = {
@@ -47,7 +48,8 @@ db.Activation = {
     db._writeDb('Activation', []);
 
     return {
-      then: (func) => { func() }
+      then: (func) => { func();
+                        return db.catchFunc; }
     };
   },
   upsert: (object) => {
@@ -69,7 +71,29 @@ db.Activation = {
     logger.silly(saved_object);
 
     return {
-      then: (func) => { func(saved_object) }
+      then: (func) => { func(saved_object);
+                        return db.catchFunc; },
+    };
+  },
+  findOne: (params) => {
+    let match = undefined;
+
+    let records = db.Activation._db();
+    for (let record of records) {
+      record_loop:
+      for (let param in params) {
+        if (record[param] != params[param]) {
+          break record_loop;
+        }
+      }
+
+      match = record;
+      break;
+    }
+
+    return {
+      then: (func) => { func(match);
+                        return db.catchFunc; }
     };
   },
   findAndCountAll: () => {
@@ -78,7 +102,8 @@ db.Activation = {
     result.count = result.rows.length;
 
     return {
-      then: (func) => { func(result) }
+      then: (func) => { func(result);
+                        return db.catchFunc; }
     };
   }
 };
