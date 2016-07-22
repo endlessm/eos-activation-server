@@ -28,6 +28,7 @@
     "pm2": "^1.1.3",
     "sequelize": "^3.23.6",
     "sequelize-cli": "^2.4.0",
+    "soap": "^0.16.0",
     "winston": "^2.2.0"
   },
   "devDependencies": {

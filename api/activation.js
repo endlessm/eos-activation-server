@@ -30,8 +30,11 @@ const activation = (router, logger) => {
   }
 
   const insertActivationRecord = (res, record) => {
+    logger.info("Activation attempt:");
+    logger.info(record);
+
     db.Activation.upsert(record)
-                 .then((record) => {
+                 .then((ingestedRecord) => {
       logger.info("Activation saved:");
       logger.info(record);
 
@@ -95,9 +98,9 @@ const activation = (router, logger) => {
           db.Activation.findOne({ where: { serial: activation.serial }})
             .then((record) => {
               if (record) {
-                logger.error("Found!");
+                logger.error('Found!');
                 res.status(409)
-                   .json({ error: "Serial already activated! Ignoring!",
+                   .json({ error: 'Serial "' + record + '" already activated! Ignoring!',
                            success: false });
 
               } else {
