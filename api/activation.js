@@ -28,6 +28,25 @@ const activation = (router, logger) => {
                  'release']
   }
 
+  const insertActivationRecord = (res, record) => {
+    db.Activation.upsert(record)
+                 .then((record) => {
+      logger.info("Activation saved:");
+      logger.info(record);
+
+      res.status(200)
+         .json({ success: true });
+    }).catch((err) => {
+      logger.error(err);
+
+      res.status(500)
+         .json({ error: err.toString(),
+                 success: false });
+
+      throw err;
+    });
+  }
+
   router.put('/v1/activate', (req, res) => {
     res.format({
       'application/json': () => {
@@ -68,24 +87,6 @@ const activation = (router, logger) => {
           }
         }
 
-        const insertActivationRecord = (record) => {
-          db.Activation.upsert(activation)
-                       .then((activation) => {
-            logger.info("Activation saved:");
-            logger.info(activation);
-
-            res.status(200)
-               .json({ success: true });
-          }).catch((err) => {
-            logger.error(err);
-
-            res.status(500)
-               .json({ error: err.toString(),
-                       success: false });
-
-            throw err;
-          });
-        }
 
         if (activation.serial) {
           db.Activation.findOne({ where: { serial: activation.serial }})
@@ -97,7 +98,7 @@ const activation = (router, logger) => {
                            success: false });
 
               } else {
-                insertActivationRecord(activation);
+                insertActivationRecord(res, activation);
               }
             })
             .catch((err) => {
@@ -109,7 +110,7 @@ const activation = (router, logger) => {
             return;
         }
 
-        insertActivationRecord(activation);
+        insertActivationRecord(res, activation);
       },
 
       'default': () => {
