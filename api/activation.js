@@ -5,6 +5,7 @@ const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
 
+const activationHooks = require('../activation_hooks');
 const db = require('../db');
 
 const Validator = require('jsonschema').Validator;
@@ -33,6 +34,8 @@ const activation = (router, logger) => {
                  .then((record) => {
       logger.info("Activation saved:");
       logger.info(record);
+
+      activationHooks(record);
 
       res.status(200)
          .json({ success: true });
