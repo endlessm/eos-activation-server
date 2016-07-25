@@ -3,7 +3,6 @@
 
 // XXX: Hack so that we don't require setting of env var on each run
 //      Upstream: https://github.com/mochajs/mocha/issues/185
-
 process.env.NODE_ENV = 'test';
 
 const chai = require('chai');
@@ -15,7 +14,7 @@ const winston = require('winston');
 
 const db = require('../../db');
 
-describe('Activation', () => {
+describe('Activation (integration)', () => {
   const HOST = 'localhost:3030';
 
   let goodParams;

@@ -38,6 +38,7 @@
     "chai-datetime": "^1.4.1",
     "mocha": "^2.5.3",
     "mocha-jenkins-reporter": "^0.2.3",
+    "sinon": "^1.17.4",
     "supertest": "^1.2.0",
     "supertest-as-promised": "^3.2.0"
   }
