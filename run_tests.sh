@@ -6,6 +6,12 @@ PM2="./node_modules/pm2/bin/pm2"
 export HTTP_PORT=3030
 export NODE_ENV=test
 
+# We may be running on an ancient version of Node
+NODE='node'
+if [ "$(which $NODE)" == "" ]; then
+  NODE='nodejs --harmony'
+fi
+
 JENKINS_OUTPUT="false"
 if [ $# -gt 0 ] && [ "$1" == "--jenkins" ]; then
   echo "Jenkins reporter activated"
@@ -20,7 +26,7 @@ pushd $CURRENT_DIR > /dev/null
     fi
 
     echo "Starting server"
-    node app.js &
+    $NODE app.js &
 
     server_pid=$!
     trap "kill $server_pid &>/dev/null || true" EXIT
