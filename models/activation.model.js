@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     paranoid: false,
     freezeTableName: true,
-    tableName: 'activation'
+    tableName: 'activation',
+    indexes: [
+      // TODO: Do indexes
+    ]
   });
 };
