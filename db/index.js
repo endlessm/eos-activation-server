@@ -3,9 +3,10 @@
 
 let db;
 
-if (process.env.NODE_ENV == 'test') {
-  // db = require('./mockDb');
-  db = require('./sqlDb');
+let useMockDb = true;
+
+if (useMockDb && process.env.NODE_ENV == 'test') {
+  db = require('./mockDb');
 } else {
   db = require('./sqlDb');
 }
