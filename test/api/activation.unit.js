@@ -68,6 +68,9 @@ describe('Activation (unit)', () => {
       status = statusCode;
       return { json: (json) => {
                  returnVal = json;
+               },
+               send: (data) => {
+                 returnVal = data;
                }
       }
     }
@@ -128,8 +131,12 @@ describe('Activation (unit)', () => {
         done();
       });
 
-      xit('of something else is rejected', (done) => {
-        throw new Error('Finish me');
+      it('of something else is rejected', (done) => {
+        const response = invokeHandler('default', goodParams);
+
+        expect(response.body).to.be.eql('Not Acceptable');
+        expect(response.status).to.be.equal(406);
+
         done();
       });
     });
