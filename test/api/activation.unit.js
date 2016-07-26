@@ -50,6 +50,41 @@ describe('Activation (unit)', () => {
     return handler;
   }
 
+  const invokeHandler = (type, value) => {
+    const handler = getHandler();
+
+    let req = {};
+    let res = {};
+
+    let formats;
+    let returnVal;
+    let status;
+
+    res.format = (formatSpec) => {
+      formats = formatSpec;
+    }
+
+    res.status = (statusCode) => {
+      status = statusCode;
+      return { json: (json) => {
+                 returnVal = json;
+               }
+      }
+    }
+
+    req.body = value;
+
+    handler(req, res);
+
+    expect(formats).to.be.not.equal(undefined);
+
+    const typeHandler = formats[type];
+    typeHandler();
+
+    return { status: status,
+             body: returnVal };
+  }
+
   describe('(v1)', () => {
     beforeEach((done) => {
       goodParams = { image: 'image',
@@ -76,56 +111,19 @@ describe('Activation (unit)', () => {
 
     describe('content type', ()  => {
       it('of json is accepted', (done) => {
-        const handler = getHandler();
+        const response = invokeHandler('application/json', goodParams);
 
-        let req;
-        let res = {};
-        let formats;
-
-        res.format = (formatSpec) => {
-          formats = formatSpec;
-        }
-
-        handler(req, res);
-
-        expect(formats).to.have.property('application/json');
+        expect(response.body.success).to.be.eql(true);
+        expect(response.status).to.be.equal(200);
 
         done();
       });
 
       it('of bad json is not accepted', (done) => {
-        const handler = getHandler();
+        const response = invokeHandler('application/json', "sadsasd");
 
-        let req = {};
-        let res = {};
-
-        let formats;
-        let returnVal;
-        let status;
-
-        res.format = (formatSpec) => {
-          formats = formatSpec;
-        }
-
-        res.status = (statusCode) => {
-          status = statusCode;
-          return { json: (json) => {
-                     returnVal = json;
-                   }
-          }
-        }
-
-        req.body = JSON.stringify(goodParams);
-
-        handler(req, res);
-
-        expect(formats).to.be.not.equal(undefined);
-
-        const jsonHandler = formats['application/json'];
-        jsonHandler();
-
-        expect(returnVal.success).to.be.eql(false);
-        expect(status).to.be.equal(400);
+        expect(response.body.success).to.be.eql(false);
+        expect(response.status).to.be.equal(400);
 
         done();
       });
