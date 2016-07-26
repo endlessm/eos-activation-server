@@ -32,6 +32,24 @@ describe('Activation (unit)', () => {
     return Math.abs(savedDate - new Date()) < 1000;
   };
 
+  const getHandler = () => {
+    let handler;
+
+    let mockRouter = {
+      routes: {},
+      put: (endpoint, func) => {
+        handler = func;
+      }
+    }
+
+    const testInstance = testClass(mockRouter, logger);
+
+    // Sanity check
+    expect(handler).to.be.not.equal(undefined);
+
+    return handler;
+  }
+
   describe('(v1)', () => {
     beforeEach((done) => {
       goodParams = { image: 'image',
@@ -57,13 +75,58 @@ describe('Activation (unit)', () => {
     });
 
     describe('content type', ()  => {
-      xit('of json is accepted', (done) => {
-        const testInstance = testClass(mockRouter, logger);
+      it('of json is accepted', (done) => {
+        const handler = getHandler();
+
+        let req;
+        let res = {};
+        let formats;
+
+        res.format = (formatSpec) => {
+          formats = formatSpec;
+        }
+
+        handler(req, res);
+
+        expect(formats).to.have.property('application/json');
+
         done();
       });
 
-      xit('of bad json is not accepted', (done) => {
-        throw new Error('Finish me');
+      it('of bad json is not accepted', (done) => {
+        const handler = getHandler();
+
+        let req = {};
+        let res = {};
+
+        let formats;
+        let returnVal;
+        let status;
+
+        res.format = (formatSpec) => {
+          formats = formatSpec;
+        }
+
+        res.status = (statusCode) => {
+          status = statusCode;
+          return { json: (json) => {
+                     returnVal = json;
+                   }
+          }
+        }
+
+        req.body = JSON.stringify(goodParams);
+
+        handler(req, res);
+
+        expect(formats).to.be.not.equal(undefined);
+
+        const jsonHandler = formats['application/json'];
+        jsonHandler();
+
+        expect(returnVal.success).to.be.eql(false);
+        expect(status).to.be.equal(400);
+
         done();
       });
 
