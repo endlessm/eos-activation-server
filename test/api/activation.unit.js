@@ -142,28 +142,56 @@ describe('Activation (unit)', () => {
     });
 
     describe('parameter test', ()  => {
-      xit('should not fail if full params are good', (done) => {
-        throw new Error('Finish me');
+      it('should not fail if full params are good', (done) => {
+        const response = invokeHandler('application/json', goodParams);
+
+        expect(response.body.success).to.be.eql(true);
+        expect(response.status).to.be.equal(200);
+
         done();
       });
 
-      xit('should fail if image name is not included', (done) => {
-        throw new Error('Finish me');
+      it('should fail if image name is not included', (done) => {
+        delete goodParams.image;
+
+        const response = invokeHandler('application/json', goodParams);
+
+        expect(response.body.success).to.be.eql(false);
+        expect(response.status).to.be.equal(400);
+
         done();
       });
 
-      xit('should fail if vendor name is not included', (done) => {
-        throw new Error('Finish me');
+      it('should fail if vendor name is not included', (done) => {
+        delete goodParams.vendor;
+
+        const response = invokeHandler('application/json', goodParams);
+
+        expect(response.body.success).to.be.eql(false);
+        expect(response.status).to.be.equal(400);
+
         done();
       });
 
-      xit('should fail if product name is not included', (done) => {
-        throw new Error('Finish me');
+      it('should fail if product name is not included', (done) => {
+        delete goodParams.product;
+
+        const response = invokeHandler('application/json', goodParams);
+
+        expect(response.body.success).to.be.eql(false);
+        expect(response.status).to.be.equal(400);
+
         done();
       });
 
-      xit('should fail if release name is not included', (done) => {
-        throw new Error('Finish me');
+      it('should fail if release name is not included', (done) => {
+        delete goodParams.release;
+
+        const response = invokeHandler('application/json', goodParams);
+
+        expect(response.body.success).to.be.eql(false);
+        expect(response.status).to.be.equal(400);
+
         done();
       });
 
