@@ -1,8 +1,6 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-// TODO: INDEXES!!!
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('Activation', {
     id: {
@@ -28,7 +26,17 @@ module.exports = (sequelize, DataTypes) => {
     freezeTableName: true,
     tableName: 'activation',
     indexes: [
-      // TODO: Do indexes
+      { fields: ['image']     },
+      { fields: ['vendor']    },
+      { fields: ['product']   },
+      { fields: ['release']   },
+      { fields: ['serial']    },
+      { fields: ['live']      },
+      { fields: ['country']   },
+      { fields: ['region']    },
+      { fields: ['city']      },
+      { fields: ['latitude']  },
+      { fields: ['longitude'] }
     ]
   });
 };

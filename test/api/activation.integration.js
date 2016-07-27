@@ -10,9 +10,9 @@ chai.use(require('chai-datetime'));
 
 const expect = require('chai').expect;
 const request = require("supertest-as-promised");
-const winston = require('winston');
 
 const db = require('../../db');
+const logger = require('../../util').logger;
 
 describe('Activation (integration)', () => {
   const HOST = 'localhost:3030';
@@ -21,17 +21,17 @@ describe('Activation (integration)', () => {
 
   const errorHandler = (err, res) => {
     if (err) {
-      winston.error("---------------");
-      winston.error(err);
+      logger.error("---------------");
+      logger.error(err);
 
       if (res) {
-        winston.error(res);
-        winston.error(res.status);
-        winston.error(res.headers);
-        winston.error(res.body);
+        logger.error(res);
+        logger.error(res.status);
+        logger.error(res.headers);
+        logger.error(res.body);
       }
 
-      winston.error("---------------");
+      logger.error("---------------");
     }
   };
 

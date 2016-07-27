@@ -9,10 +9,8 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
-const logger = require('winston');
-
 const db = require('../../db');
-
+const logger = require('../../util').logger;
 
 describe('Activation (unit)', () => {
   const testClass = require('../../api/activation');
