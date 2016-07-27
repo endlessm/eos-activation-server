@@ -32,14 +32,20 @@ describe('Activation (unit)', () => {
     return Math.abs(savedDate - new Date()) < 1000;
   };
 
-  const getHandler = (hook) => {
+  const getHandler = (options) => {
     let handler;
+    let hook;
 
     let mockRouter = {
       routes: {},
       put: (endpoint, func) => {
         handler = func;
       }
+    }
+
+    if (options && options.hook) {
+      logger.debug("Attaching test hook to activation class");
+      hook = options.hook;
     }
 
     const testInstance = testClass(mockRouter, logger, hook);
@@ -50,8 +56,9 @@ describe('Activation (unit)', () => {
     return handler;
   }
 
-  const invokeHandler = (type, value, hook) => {
-    const handler = getHandler(hook);
+  const invokeHandler = (type, value, options) => {
+    logger.debug('Handler options defined:', options);
+    const handler = getHandler(options);
 
     let req = {};
     let res = {};
@@ -76,6 +83,10 @@ describe('Activation (unit)', () => {
     }
 
     req.body = value;
+
+    if (options && options.ip) {
+      req.ip = options.ip;
+    }
 
     handler(req, res);
 
@@ -211,24 +222,22 @@ describe('Activation (unit)', () => {
           done();
         }
 
-        const response = invokeHandler('application/json', goodParams, hook);
+        const response = invokeHandler('application/json', goodParams, { hook: hook });
 
         // Sanity check
         expect(response.body.success).to.be.eql(true);
         expect(response.status).to.be.equal(200);
       });
 
-      it('arein\'t invoked when data is bad', (done) => {
+      it('aren\'t invoked when data is bad', (done) => {
         delete goodParams.image;
 
         let recordSentToHook;
         let hook = (record) => {
-          fail('Should not have gotten here');
-
-          done();
+          throw new Error('Should not have gotten here');
         }
 
-        const response = invokeHandler('application/json', goodParams, hook);
+        const response = invokeHandler('application/json', goodParams, { hook: hook });
 
         // Sanity check
         expect(response.body.success).to.not.be.eql(true);
@@ -238,56 +247,19 @@ describe('Activation (unit)', () => {
     });
 
     describe('geolocation', ()  => {
-      xit('should not fail if geolocation is unknown', (done) => {
-        throw new Error('Finish me');
+      it('should not fail if geolocation is unknown', (done) => {
+        const response = invokeHandler('application/json', goodParams, { ip: '127.0.0.1' });
+
+        expect(response.body.success).to.be.eql(true);
+        expect(response.status).to.be.equal(200);
+
         done();
       });
     });
 
     describe('data persistence', ()  => {
-      let image =   'image '   + Math.random();
-      let vendor =  'vendor '  + Math.random();
-      let product = 'product ' + Math.random();
-      let release = 'release ' + Math.random();
-      let serial =  'serial '  + Math.random();
-      let live = Math.random() > 0.5 ? true : false;
-
-      beforeEach((done) => {
-        goodParams = { image: image,
-                       vendor: vendor,
-                       product: product,
-                       release: release,
-                       serial: serial,
-                       live: live };
-
-        db.Activation.sync({ force : true }).then(() => {
-          done();
-        });
-      });
-
-      xit('saves correct data in the database', (done) => {
-        throw new Error('Finish me');
-        done();
-      });
-
-      xit('saves the 3-letter country code instead of the 2-letter one', (done) => {
-        throw new Error('Finish me');
-        done();
-      });
-
-      xit('does not create duplicates of same serial', (done) => {
-        throw new Error('Finish me');
-        done();
-      });
-
-      xit('does not fail if there\'s no serial', (done) => {
-        throw new Error('Finish me');
-        done();
-      });
-
-      xit('stores the record creation date', (done) => {
-        throw new Error('Finish me');
-        done();
+      xit('works', (done) => {
+        throw new Error('!! Covered already by integration tests !!');
       });
     });
   });

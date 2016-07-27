@@ -5,13 +5,12 @@ const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
 
-const activationHooks = require('../activation_hooks');
 const db = require('../db');
 
 const Validator = require('jsonschema').Validator;
 
-// Overridable by injection for tests
-let hooksHandler = activationHooks;
+// Overridable on import of this module
+let hooksHandler;
 
 const activation = (router, logger) => {
   const validator = new Validator();
@@ -58,6 +57,7 @@ const activation = (router, logger) => {
     res.format({
       'application/json': () => {
         let success = true;
+
 
         // Validate things
         const validationResult = validator.validate(req.body, activation_schema)
@@ -132,7 +132,11 @@ const activation = (router, logger) => {
 // Allows injection of hook handler
 exports = module.exports = (router, logger, handler) => {
   if (handler) {
+    logger.warn('Activation hook handler overriden!');
     hooksHandler = handler;
+  } else {
+    logger.debug('Using default activation hook handler');
+    hooksHandler = require('../activation_hooks');
   }
 
   return activation(router, logger);
