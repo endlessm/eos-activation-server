@@ -10,6 +10,9 @@ const db = require('../db');
 
 const Validator = require('jsonschema').Validator;
 
+// Overridable by injection for tests
+let hooksHandler = activationHooks;
+
 const activation = (router, logger) => {
   const validator = new Validator();
 
@@ -36,7 +39,7 @@ const activation = (router, logger) => {
                  .then((ingestedRecord) => {
       logger.info('Activation saved:', record);
 
-      activationHooks(record);
+      hooksHandler(record);
 
       res.status(200)
          .json({ success: true });
@@ -126,4 +129,11 @@ const activation = (router, logger) => {
   return router;
 }
 
-exports = module.exports = activation;
+// Allows injection of hook handler
+exports = module.exports = (router, logger, handler) => {
+  if (handler) {
+    hooksHandler = handler;
+  }
+
+  return activation(router, logger);
+}

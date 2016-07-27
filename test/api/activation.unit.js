@@ -32,7 +32,7 @@ describe('Activation (unit)', () => {
     return Math.abs(savedDate - new Date()) < 1000;
   };
 
-  const getHandler = () => {
+  const getHandler = (hook) => {
     let handler;
 
     let mockRouter = {
@@ -42,7 +42,7 @@ describe('Activation (unit)', () => {
       }
     }
 
-    const testInstance = testClass(mockRouter, logger);
+    const testInstance = testClass(mockRouter, logger, hook);
 
     // Sanity check
     expect(handler).to.be.not.equal(undefined);
@@ -50,8 +50,8 @@ describe('Activation (unit)', () => {
     return handler;
   }
 
-  const invokeHandler = (type, value) => {
-    const handler = getHandler();
+  const invokeHandler = (type, value, hook) => {
+    const handler = getHandler(hook);
 
     let req = {};
     let res = {};
@@ -195,8 +195,44 @@ describe('Activation (unit)', () => {
         done();
       });
 
-      xit('calls the expected hooks', (done) => {
-        throw new Error('Finish me');
+    });
+
+    describe('hooks', () => {
+      it('are invoked correctly', (done) => {
+        let recordSentToHook;
+        let hook = (record) => {
+          expect(record).to.be.not.equal(undefined);
+
+          for (let prop in goodParams) {
+            expect(record).to.have.property(prop);
+            expect(record[prop]).to.be.eql(goodParams[prop]);
+          }
+
+          done();
+        }
+
+        const response = invokeHandler('application/json', goodParams, hook);
+
+        // Sanity check
+        expect(response.body.success).to.be.eql(true);
+        expect(response.status).to.be.equal(200);
+      });
+
+      it('arein\'t invoked when data is bad', (done) => {
+        delete goodParams.image;
+
+        let recordSentToHook;
+        let hook = (record) => {
+          fail('Should not have gotten here');
+
+          done();
+        }
+
+        const response = invokeHandler('application/json', goodParams, hook);
+
+        // Sanity check
+        expect(response.body.success).to.not.be.eql(true);
+
         done();
       });
     });
