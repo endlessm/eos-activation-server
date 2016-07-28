@@ -9,7 +9,6 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
-const db = require('../../db');
 const logger = require('../../util').logger;
 
 describe('Activation (unit)', () => {
@@ -55,46 +54,56 @@ describe('Activation (unit)', () => {
   }
 
   const invokeHandler = (type, value, options) => {
-    logger.debug('Handler options defined:', options);
-    const handler = getHandler(options);
 
-    let req = {};
-    let res = {};
+    const promise = new Promise((resolve, reject) => {
+      logger.debug('Handler options defined:', options);
+      const handler = getHandler(options);
 
-    let formats;
-    let returnVal;
-    let status;
+      let req = {};
+      let res = {};
 
-    res.format = (formatSpec) => {
-      formats = formatSpec;
-    }
+      let formats;
 
-    res.status = (statusCode) => {
-      status = statusCode;
-      return { json: (json) => {
-                 returnVal = json;
-               },
-               send: (data) => {
-                 returnVal = data;
-               }
+      res.format = (formatSpec) => {
+        logger.debug('Format spec set');
+        formats = formatSpec;
       }
-    }
 
-    req.body = value;
+      res.status = (statusCode) => {
+        logger.debug('API set status code to', statusCode);
+        return { json: (json) => {
+                   logger.debug('API returning', json);
+                   resolve({ status: statusCode,
+                             body: json });
+                 },
+                 send: (data) => {
+                   logger.debug('API returning', data);
+                   resolve({ status: statusCode,
+                             body: data });
+                 }
+        }
+      }
 
-    if (options && options.ip) {
-      req.ip = options.ip;
-    }
+      req.body = value;
 
-    handler(req, res);
+      if (options && options.ip) {
+        req.ip = options.ip;
+      }
 
-    expect(formats).to.be.not.equal(undefined);
+      handler(req, res);
 
-    const typeHandler = formats[type];
-    typeHandler();
+      expect(formats).to.be.not.equal(undefined);
 
-    return { status: status,
-             body: returnVal };
+      logger.debug('Invoking type handler');
+
+      const typeHandler = formats[type];
+      typeHandler();
+
+      logger.debug('Waiting for async resolution');
+    });
+
+    return promise;
+
   }
 
   describe('(v1)', () => {
@@ -123,92 +132,91 @@ describe('Activation (unit)', () => {
 
     describe('content type', ()  => {
       it('of json is accepted', (done) => {
-        const response = invokeHandler('application/json', goodParams);
+        invokeHandler('application/json', goodParams).then((response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
 
-        expect(response.body.success).to.be.eql(true);
-        expect(response.status).to.be.equal(200);
-
-        done();
+          done();
+        });
       });
 
       it('of bad json is not accepted', (done) => {
-        const response = invokeHandler('application/json', "sadsasd");
+        invokeHandler('application/json', "testing").then((response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
 
-        expect(response.body.success).to.be.eql(false);
-        expect(response.status).to.be.equal(400);
-
-        done();
+          done();
+        });
       });
 
       it('of something else is rejected', (done) => {
-        const response = invokeHandler('default', goodParams);
+        invokeHandler('default', goodParams).then((response) => {
+          expect(response.body).to.be.eql('Not Acceptable');
+          expect(response.status).to.be.equal(406);
 
-        expect(response.body).to.be.eql('Not Acceptable');
-        expect(response.status).to.be.equal(406);
-
-        done();
+          done();
+        });
       });
     });
 
     describe('parameter test', ()  => {
       it('should not fail if full params are good', (done) => {
-        const response = invokeHandler('application/json', goodParams);
+        invokeHandler('application/json', goodParams).then((response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
 
-        expect(response.body.success).to.be.eql(true);
-        expect(response.status).to.be.equal(200);
-
-        done();
+          done();
+        });
       });
 
       it('should fail if image name is not included', (done) => {
         delete goodParams.image;
 
-        const response = invokeHandler('application/json', goodParams);
+        invokeHandler('application/json', goodParams).then((response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
 
-        expect(response.body.success).to.be.eql(false);
-        expect(response.status).to.be.equal(400);
-
-        done();
+          done();
+        });
       });
 
       it('should fail if vendor name is not included', (done) => {
         delete goodParams.vendor;
 
-        const response = invokeHandler('application/json', goodParams);
+        invokeHandler('application/json', goodParams).then((response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
 
-        expect(response.body.success).to.be.eql(false);
-        expect(response.status).to.be.equal(400);
-
-        done();
+          done();
+        });
       });
 
       it('should fail if product name is not included', (done) => {
         delete goodParams.product;
 
-        const response = invokeHandler('application/json', goodParams);
+        invokeHandler('application/json', goodParams).then((response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
 
-        expect(response.body.success).to.be.eql(false);
-        expect(response.status).to.be.equal(400);
-
-        done();
+          done();
+        });
       });
 
       it('should fail if release name is not included', (done) => {
         delete goodParams.release;
 
-        const response = invokeHandler('application/json', goodParams);
+        invokeHandler('application/json', goodParams).then((response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
 
-        expect(response.body.success).to.be.eql(false);
-        expect(response.status).to.be.equal(400);
-
-        done();
+          done();
+        });
       });
 
     });
 
     describe('hooks', () => {
       it('are invoked correctly', (done) => {
-        let recordSentToHook;
         let hook = (record) => {
           expect(record).to.be.not.equal(undefined);
 
@@ -220,38 +228,35 @@ describe('Activation (unit)', () => {
           done();
         }
 
-        const response = invokeHandler('application/json', goodParams, { hook: hook });
-
-        // Sanity check
-        expect(response.body.success).to.be.eql(true);
-        expect(response.status).to.be.equal(200);
+        invokeHandler('application/json', goodParams, { hook: hook }).then((response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
       });
 
       it('aren\'t invoked when data is bad', (done) => {
         delete goodParams.image;
-
-        let recordSentToHook;
         let hook = (record) => {
-          throw new Error('Should not have gotten here');
+          done(new Error('Should not have gotten here'));
         }
 
-        const response = invokeHandler('application/json', goodParams, { hook: hook });
+        invokeHandler('application/json', goodParams, { hook: hook }).then((response) => {
+          // Sanity check
+          expect(response.body.success).to.not.be.eql(true);
 
-        // Sanity check
-        expect(response.body.success).to.not.be.eql(true);
-
-        done();
+          done();
+        });
       });
     });
 
     describe('geolocation', ()  => {
       it('should not fail if geolocation is unknown', (done) => {
-        const response = invokeHandler('application/json', goodParams, { ip: '127.0.0.1' });
+        invokeHandler('application/json', goodParams, { ip: '127.0.0.1' }).then((response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
 
-        expect(response.body.success).to.be.eql(true);
-        expect(response.status).to.be.equal(200);
-
-        done();
+          done();
+        });
       });
     });
 
