@@ -98,7 +98,7 @@ const activation = (router, logger) => {
           db.Activation.findOne({ where: { serial: activation.serial }})
             .then((record) => {
               if (record) {
-                logger.error('Found!');
+                logger.error('Record already in database! (SN: "' + activation.serial + '")');
                 res.status(409)
                    .json({ error: 'Serial "' + record.serial + '" already activated! Ignoring!',
                            success: false });
@@ -108,9 +108,9 @@ const activation = (router, logger) => {
               }
             })
             .catch((err) => {
-                res.status(304)
-                   .json({ error: "Serial already activated!",
-                           success: true });
+              res.status(304)
+                 .json({ error: "Serial already activated!",
+                         success: true });
             });
 
             return;
