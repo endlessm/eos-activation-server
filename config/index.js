@@ -4,8 +4,7 @@
 const logger = require('../util').logger
 
 const server_port = process.env.HTTP_PORT || 3000;
-const server_bind_address = process.env.NODE_ENV == 'test' ? '127.0.0.1'
-                                                           : '0.0.0.0';
+const server_bind_address = process.env.BIND_ADDRESS || '127.0.0.1';
 
 // Crash handler
 process.on('uncaughtException', (err) => {
