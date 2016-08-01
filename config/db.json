@@ -2,22 +2,18 @@
   "development": {
     "username": "admin",
     "password": "password",
-    "database": "eos-activation-server_dev",
+    "database": "eos-activation-service_dev",
     "host": "127.0.0.1",
     "dialect": "postgresql"
   },
   "test": {
-    "database": "eos-activation-server_test",
+    "database": "eos-activation-service_test",
     "host": "127.0.0.1",
     "dialect": "sqlite",
     "storage": "tmp/sqlite.db",
     "logging": false
   },
   "production": {
-    "username": "admin",
-    "password": "CHANGEME",
-    "database": "eos-activation-server",
-    "host": "127.0.0.1",
-    "dialect": "postgresql"
+    "use_env_variable": "EOS_ACTIVATION_DB"
   }
 }
