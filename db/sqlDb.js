@@ -13,6 +13,14 @@ const logger = require('../util').logger;
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable]);
+} else if (config.use_file) {
+  var filepath = config.use_file;
+  if (filepath[0] === '~') {
+    filepath = path.join(process.env.HOME, filepath.slice(1));
+  }
+
+  const connectionString = fs.readFileSync(filepath, 'utf8').trim();
+  var sequelize = new Sequelize(connectionString);
 } else {
   var sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
