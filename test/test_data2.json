@@ -1,6 +1,6 @@
-{ "image": "image",
+{ "image": "eosoem-foobar",
   "vendor": "vendor",
   "product": "ffffffffffffffffffffffffffffffffffffffff",
   "release": "release",
-  "serial": "AAAAAAAAAAAAAAA",
-  "live": true }
+  "serial": "BBBBBBBBBBBBBBB",
+  "live": false }
