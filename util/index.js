@@ -3,7 +3,7 @@
 
 const winston = require('winston');
 
-const loggingLevel = process.env.NODE_ENV == 'test' ? 'error'
+const loggingLevel = process.env.NODE_ENV == 'test' ? 'info'
                                                     : 'info';
 const logger = new (winston.Logger) ({
   transports: [
