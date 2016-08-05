@@ -91,7 +91,7 @@ pushd $CURRENT_DIR >/dev/null
   echo
   echo
   echo =============================
-  ami_id=$( echo ${artifacts[${image}]} | cut -d: -f2)
+  ami_id=$( echo ${artifact} | cut -d: -f2)
   echo updating ami_image.txt with ${ami_id}
   echo "$ami_id" > ami_image.txt
   echo =============================
