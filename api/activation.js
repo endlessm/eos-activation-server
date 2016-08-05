@@ -77,8 +77,9 @@ const activation = (router, logger) => {
         let activation = req.body;
 
         // Get geolocation
-        // TODO: req.ips
-        const geoLookup = geoip.lookup(req.ip);
+        // 'X-Real-IP' is provided by NGINX
+        const ip = req.headers['X-Real-IP'] || req.ip;
+        const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
           logger.info('Geo:', geoLookup);
 
