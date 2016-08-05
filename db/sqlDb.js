@@ -44,10 +44,16 @@ Object.keys(db).forEach(function(modelName) {
 });
 
 sequelize.authenticate()
-         .then(function(err) {
+         .then((err) => {
             logger.info('DB Connection established successfully');
+
+            // TODO: Remove me after getting migrations working
+            logger.info('Creatig tables');
+            sequelize.sync().then((err) => {
+              logger.info('Tables created!');
+            });
           })
-          .catch(function (err) {
+          .catch((err) => {
             logger.error('Unable to connect to the database:', err);
             throw err;
           });
