@@ -17,10 +17,9 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-// XXX: For tests we need to be able to spoof IPs
-if (config.env == 'test') {
-  app.enable('trust proxy');
-}
+// XXX: For tests we need to be able to spoof IPs and
+//      for prod/staging we are behind NGINX
+app.enable('trust proxy');
 
 app.use(api.router);
 
