@@ -33,7 +33,7 @@ pushd $CURRENT_DIR > /dev/null
   else
     if [ "$($PM2 info eos-activation-server --no-color | grep status | grep online)" == "" ]; then
       $PM2 --watch . \
-           --ignore-watch "\.git ^test tmp" \
+           --ignore-watch "\.git ^test tmp packer_log\.txt packer" \
            -i 1 \
            -n eos-activation-server \
            start ./app.js
