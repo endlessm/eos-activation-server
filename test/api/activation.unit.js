@@ -56,7 +56,7 @@ describe('Activation (unit)', () => {
   const invokeHandler = (type, value, options) => {
 
     const promise = new Promise((resolve, reject) => {
-      logger.debug('Handler options defined:', options);
+      logger.debug('Handler options:', options);
       const handler = getHandler(options);
 
       let req = {};
@@ -85,6 +85,7 @@ describe('Activation (unit)', () => {
       }
 
       req.body = value;
+      req.headers = {};
 
       if (options && options.ip) {
         req.ip = options.ip;
@@ -97,13 +98,13 @@ describe('Activation (unit)', () => {
       logger.debug('Invoking type handler');
 
       const typeHandler = formats[type];
+      logger.debug('Type handler', typeHandler);
       typeHandler();
 
       logger.debug('Waiting for async resolution');
     });
 
     return promise;
-
   }
 
   describe('(v1)', () => {

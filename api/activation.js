@@ -35,7 +35,7 @@ const activation = (router, logger) => {
     logger.info('Activation attempt:', record);
 
     db.Activation.upsert(record)
-                 .then((ingestedRecord) => {
+                 .then((changed) => {
       logger.info('Activation saved:', record);
 
       hooksHandler(record);
@@ -58,7 +58,6 @@ const activation = (router, logger) => {
       'application/json': () => {
         let success = true;
 
-
         // Validate things
         const validationResult = validator.validate(req.body, activation_schema)
         if (validationResult.errors.length > 0) {
@@ -79,6 +78,7 @@ const activation = (router, logger) => {
         // Get geolocation
         // 'X-Real-IP' is provided by NGINX
         const ip = req.headers['X-Real-IP'] || req.ip;
+
         const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
           logger.info('Geo:', geoLookup);
@@ -92,29 +92,6 @@ const activation = (router, logger) => {
             activation.latitude = geoLookup.ll[0];
             activation.longitude = geoLookup.ll[1];
           }
-        }
-
-
-        if (activation.serial) {
-          db.Activation.findOne({ where: { serial: activation.serial }})
-            .then((record) => {
-              if (record) {
-                logger.error('Record already in database! (SN: "' + activation.serial + '")');
-                res.status(409)
-                   .json({ error: 'Serial "' + record.serial + '" already activated! Ignoring!',
-                           success: false });
-
-              } else {
-                insertActivationRecord(res, activation);
-              }
-            })
-            .catch((err) => {
-              res.status(304)
-                 .json({ error: "Serial already activated!",
-                         success: true });
-            });
-
-            return;
         }
 
         insertActivationRecord(res, activation);

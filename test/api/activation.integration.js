@@ -237,7 +237,7 @@ describe('Activation (integration)', () => {
            });
       });
 
-      it('does not create duplicates of same serial', (done) => {
+      xit('does not create duplicates of same serial', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
@@ -259,6 +259,44 @@ describe('Activation (integration)', () => {
                .then((result) => {
                  expect(result.count).to.equal(1);
                  expect(result.rows[0].serial).to.eql(serial);
+
+                 done();
+               })
+               .catch((err) => {
+                 errorHandler(err);
+
+                 done(err);
+               });
+          })
+          .catch((err, res) => {
+             errorHandler(err, res);
+             done(err);
+          });
+      });
+
+      it('handles duplicates', (done) => {
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then((res) => {
+             expect(res.body.success).to.equal(true);
+
+             return request(HOST)
+               .put('/v1/activate')
+               .set('X-Forwarded-For', '204.28.125.53')
+               .send(goodParams)
+               .expect('Content-Type', /json/)
+               .expect(200);
+          })
+          .then((res) => {
+             db.Activation.findAndCountAll()
+               .then((result) => {
+                 expect(result.count).to.equal(2);
+                 expect(result.rows[0].serial).to.eql(serial);
+                 expect(result.rows[1].serial).to.eql(serial);
 
                  done();
                })
