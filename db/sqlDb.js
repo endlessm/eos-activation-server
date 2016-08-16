@@ -48,7 +48,7 @@ sequelize.authenticate()
             logger.info('DB Connection established successfully');
 
             // TODO: Remove me after getting migrations working
-            logger.info('Creatig tables');
+            logger.info('Creating tables');
             sequelize.sync().then((err) => {
               logger.info('Tables created!');
             });
