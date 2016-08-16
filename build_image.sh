@@ -49,6 +49,8 @@ fi
 if ! aws ec2 describe-instances > /dev/null; then
   echo You do not seem to have proper AWS credentials! Exiting!
   exit 1
+else
+  echo "Access: OK"
 fi
 
 echo Fetching latest Packer
