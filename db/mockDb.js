@@ -2,7 +2,11 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
+
 const logger = require('../util').logger;
+
+const basename  = path.basename(module.filename);
 
 // Mock data
 const db = {
@@ -37,75 +41,91 @@ const db = {
   catchFunc: { catch: (func) => {} }
 };
 
-db.Activation = {
-  _db: () => {
-    return db._readDb('Activation');
-  },
-  sync: (params) => {
-    logger.silly("Clearing the DB");
+db.createMockDb = (name) => {
+  db[name] = {
+    _db: () => {
+      return db._readDb(name);
+    },
+    sync: (params) => {
+      logger.silly("Clearing the DB");
 
-    db.Activation._db().length = 0;
-    db._writeDb('Activation', []);
+      db[name]._db().length = 0;
+      db._writeDb(name, []);
 
-    return {
-      then: (func) => { func();
-                        return db.catchFunc; }
-    };
-  },
-  upsert: (object) => {
-    logger.silly("Upserted");
-    logger.silly(db.Activation._db());
+      return {
+        then: (func) => { func();
+                          return db.catchFunc; }
+      };
+    },
+    upsert: (object) => {
+      logger.silly("Upserted");
+      logger.silly(db[name]._db());
 
-    let new_data = db.Activation._db();
-    object.createdAt = new Date();
-    object.updatedAt = new Date();
-    new_data.push(object);
+      let new_data = db[name]._db();
+      object.createdAt = new Date();
+      object.updatedAt = new Date();
+      new_data.push(object);
 
-    db._writeDb('Activation', new_data);
+      db._writeDb(name, new_data);
 
-    logger.silly("Current item count: " + db.Activation._db().length);
+      logger.silly("Current item count: " + db[name]._db().length);
 
-    const saved_object = db.Activation._db().slice(-1)[0];
+      const saved_object = db[name]._db().slice(-1)[0];
 
-    logger.silly("Upsert saved");
-    logger.silly(saved_object);
+      logger.silly("Upsert saved");
+      logger.silly(saved_object);
 
-    return {
-      then: (func) => { func(saved_object);
-                        return db.catchFunc; },
-    };
-  },
-  findOne: (params) => {
-    let match = undefined;
+      return {
+        then: (func) => { func(saved_object);
+                          return db.catchFunc; },
+      };
+    },
+    findOne: (params) => {
+      let match = undefined;
 
-    let records = db.Activation._db();
-    for (let record of records) {
-      record_loop:
-      for (let param in params) {
-        if (record[param] != params[param]) {
-          break record_loop;
+      let records = db[name]._db();
+      for (let record of records) {
+        record_loop:
+        for (let param in params) {
+          if (record[param] != params[param]) {
+            break record_loop;
+          }
         }
+
+        match = record;
+        break;
       }
 
-      match = record;
-      break;
+      return {
+        then: (func) => { func(match);
+                          return db.catchFunc; }
+      };
+    },
+    findAndCountAll: () => {
+      let result = {};
+      result.rows = db[name]._db();
+      result.count = result.rows.length;
+
+      return {
+        then: (func) => { func(result);
+                          return db.catchFunc; }
+      };
     }
-
-    return {
-      then: (func) => { func(match);
-                        return db.catchFunc; }
-    };
-  },
-  findAndCountAll: () => {
-    let result = {};
-    result.rows = db.Activation._db();
-    result.count = result.rows.length;
-
-    return {
-      then: (func) => { func(result);
-                        return db.catchFunc; }
-    };
-  }
+  };
 };
+
+// Find out which models we have and create DB associations
+fs.readdirSync(path.join(__dirname, '..' , 'models'))
+  .filter(function(file) {
+    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-9) === '.model.js');
+  })
+  .forEach(function(file) {
+    // Strip '.model.js'
+    const name = file.slice(0, -9);
+    const capitalizeName = name.charAt(0).toUpperCase() + name.slice(1);
+    db.createMockDb(capitalizeName);
+
+    logger.debug('Associated model: ' + capitalizeName);
+  });
 
 exports = module.exports = db;
