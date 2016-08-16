@@ -6,11 +6,13 @@ const express = require('express');
 const config = require('../config');
 
 const activation = require('./activation');
+const ping = require('./ping');
 
 const router = express.Router();
 
 // Add all routes here
 activation(router, config.logger);
+ping(router, config.logger);
 
 exports = module.exports = {
   router: router
