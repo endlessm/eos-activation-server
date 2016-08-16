@@ -3,7 +3,7 @@
 
 let db;
 
-let useMockDb = false;
+let useMockDb = true;
 
 if (useMockDb && process.env.NODE_ENV == 'test') {
   db = require('./mockDb');
