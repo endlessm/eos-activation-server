@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     vendor: DataTypes.STRING,
     product: DataTypes.STRING,
     release: DataTypes.STRING,
-    count: DataTypes.BIGINT,
+    count: DataTypes.INTEGER,
     country: DataTypes.STRING,
     region: DataTypes.STRING,
     city: DataTypes.STRING,
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     paranoid: false,
     freezeTableName: true,
-    tableName: 'activation',
+    tableName: 'ping',
     indexes: [
       { fields: ['image']     },
       { fields: ['vendor']    },
