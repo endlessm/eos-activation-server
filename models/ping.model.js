@@ -17,8 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     country: DataTypes.STRING,
     region: DataTypes.STRING,
     city: DataTypes.STRING,
-    latitude: DataTypes.FLOAT,
-    longitude: DataTypes.FLOAT
   }, {
     timestamps: true,
     paranoid: false,
@@ -32,9 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       { fields: ['count']     },
       { fields: ['country']   },
       { fields: ['region']    },
-      { fields: ['city']      },
-      { fields: ['latitude']  },
-      { fields: ['longitude'] }
+      { fields: ['city']      }
     ]
   });
 };

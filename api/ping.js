@@ -85,11 +85,6 @@ const ping = (router, logger) => {
           ping.country = countries.alpha2ToAlpha3(geoLookup.country);
           ping.region = geoLookup.region;
           ping.city = geoLookup.city;
-
-          if (geoLookup.ll) {
-            ping.latitude = geoLookup.ll[0];
-            ping.longitude = geoLookup.ll[1];
-          }
         }
 
         insertPingRecord(res, ping);
