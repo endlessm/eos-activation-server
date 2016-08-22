@@ -10,16 +10,16 @@ var callbackFunction;
 
 const setUpDb = (callback) => {
   if (useMockDb && process.env.NODE_ENV == 'test') {
-    db = require('./mockDb');
+    db = require('./mock_db');
     callback(db);
   } else if (useNoSql) {
-    const noSqlDb = require('./noSqlDb');
+    const noSqlDb = require('./nosql_db');
     noSqlDb((database) => {
       callback(database);
     });
   } else {
     throw new Error('SQL database API currently disabled!');
-    db = require('./sqlDb');
+    db = require('./sql_db');
     callback(db);
   }
 }
