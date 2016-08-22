@@ -8,13 +8,23 @@ process.env.NODE_ENV = 'test';
 const chai = require('chai');
 chai.use(require('chai-datetime'));
 
+const dbDriver = require('../../db');
+
 const expect = require('chai').expect;
 const request = require("supertest-as-promised");
 
-const db = require('../../db');
+let db;
+
 const logger = require('../../util').logger;
 
 describe('Ping (integration)', () => {
+  before((done) => {
+    dbDriver((database) => {
+      db = database;
+      done();
+    });
+  });
+
   const HOST = 'localhost:3030';
 
   let goodParams;

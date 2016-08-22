@@ -3,12 +3,27 @@
 
 let db;
 
-let useMockDb = false;
+const useNoSql = true;
+const useMockDb = false;
 
-if (useMockDb && process.env.NODE_ENV == 'test') {
-  db = require('./mockDb');
-} else {
-  db = require('./sqlDb');
+var callbackFunction;
+
+const setUpDb = (callback) => {
+  if (useMockDb && process.env.NODE_ENV == 'test') {
+    db = require('./mockDb');
+    callback(db);
+  } else if (useNoSql) {
+    const noSqlDb = require('./noSqlDb');
+    noSqlDb((database) => {
+      callback(database);
+    });
+  } else {
+    throw new Error('SQL database API currently disabled!');
+    db = require('./sqlDb');
+    callback(db);
+  }
 }
 
-exports = module.exports = db;
+exports = module.exports = (callback) => {
+  setUpDb(callback);
+};

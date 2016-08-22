@@ -5,7 +5,8 @@ const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
 
-const db = require('../db');
+// Overridable on import of this module
+let db;
 
 const Validator = require('jsonschema').Validator;
 
@@ -100,6 +101,8 @@ const ping = (router, logger) => {
   return router;
 }
 
-exports = module.exports = (router, logger) => {
+exports = module.exports = (router, database, logger) => {
+  db = database;
+
   return ping(router, logger);
 };

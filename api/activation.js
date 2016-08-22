@@ -5,11 +5,10 @@ const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
 
-const db = require('../db');
-
 const Validator = require('jsonschema').Validator;
 
 // Overridable on import of this module
+let db;
 let hooksHandler;
 
 const activation = (router, logger) => {
@@ -108,7 +107,7 @@ const activation = (router, logger) => {
 }
 
 // Allows injection of hook handler
-exports = module.exports = (router, logger, handler) => {
+exports = module.exports = (router, database, logger, handler) => {
   if (handler) {
     logger.warn('Activation hook handler overriden!');
     hooksHandler = handler;
@@ -116,6 +115,8 @@ exports = module.exports = (router, logger, handler) => {
     logger.debug('Using default activation hook handler');
     hooksHandler = require('../activation_hooks');
   }
+
+  db = database;
 
   return activation(router, logger);
 }

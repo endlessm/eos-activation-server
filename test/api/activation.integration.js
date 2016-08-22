@@ -11,10 +11,20 @@ chai.use(require('chai-datetime'));
 const expect = require('chai').expect;
 const request = require("supertest-as-promised");
 
-const db = require('../../db');
+const dbDriver = require('../../db');
+
 const logger = require('../../util').logger;
 
+let db;
+
 describe('Activation (integration)', () => {
+  before((done) => {
+    dbDriver((database) => {
+      db = database;
+      done()
+    });
+  });
+
   const HOST = 'localhost:3030';
 
   let goodParams;
@@ -25,7 +35,7 @@ describe('Activation (integration)', () => {
       logger.error(err);
 
       if (res) {
-        logger.error(res);
+        // logger.error(res);
         logger.error(res.status);
         logger.error(res.headers);
         logger.error(res.body);
@@ -187,6 +197,7 @@ describe('Activation (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
+              logger.error("Finding matching records...");
               db.Activation.findAndCountAll().then((result) => {
                 expect(result.count).to.equal(1);
 
@@ -294,9 +305,8 @@ describe('Activation (integration)', () => {
           .then((res) => {
              db.Activation.findAndCountAll()
                .then((result) => {
-                 expect(result.count).to.equal(2);
+                 expect(result.count).to.equal(1);
                  expect(result.rows[0].serial).to.eql(serial);
-                 expect(result.rows[1].serial).to.eql(serial);
 
                  done();
                })

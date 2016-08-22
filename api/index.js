@@ -10,9 +10,13 @@ const ping = require('./ping');
 
 const router = express.Router();
 
-// Add all routes here
-activation(router, config.logger);
-ping(router, config.logger);
+const dbBackend = require('../db');
+
+dbBackend((db) => {
+  // Add all routes here
+  activation(router, db, config.logger);
+  ping(router, db, config.logger);
+});
 
 exports = module.exports = {
   router: router

@@ -61,22 +61,23 @@ db.createMockDb = (name) => {
       logger.silly("Upserted");
       logger.silly(db[name]._db());
 
-      let new_data = db[name]._db();
-      object.createdAt = new Date();
-      object.updatedAt = new Date();
-      new_data.push(object);
+      db[name].findOne(object).then((record) => {
+        if (record == undefined) {
+          let new_data = db[name]._db();
+          object.createdAt = new Date();
+          object.updatedAt = new Date();
+          new_data.push(object);
 
-      db._writeDb(name, new_data);
+          db._writeDb(name, new_data);
 
-      logger.silly("Current item count: " + db[name]._db().length);
+          logger.silly("Current item count: " + db[name]._db().length);
 
-      const saved_object = db[name]._db().slice(-1)[0];
-
-      logger.silly("Upsert saved");
-      logger.silly(saved_object);
+          logger.silly("Upsert saved");
+        }
+      });
 
       return {
-        then: (func) => { func(saved_object);
+        then: (func) => { func(true);
                           return db.catchFunc; },
       };
     },

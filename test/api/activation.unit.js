@@ -9,9 +9,20 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
+const dbDriver = require('../../db');
+
 const logger = require('../../util').logger;
 
+let db;
+
 describe('Activation (unit)', () => {
+  before((done) => {
+    dbDriver((database) => {
+      db = database;
+      done();
+    });
+  });
+
   const testClass = require('../../api/activation');
 
   let goodParams;
@@ -45,7 +56,7 @@ describe('Activation (unit)', () => {
       hook = options.hook;
     }
 
-    const testInstance = testClass(mockRouter, logger, hook);
+    const testInstance = testClass(mockRouter, db, logger, hook);
 
     // Sanity check
     expect(handler).to.be.not.equal(undefined);
@@ -54,7 +65,6 @@ describe('Activation (unit)', () => {
   }
 
   const invokeHandler = (type, value, options) => {
-
     const promise = new Promise((resolve, reject) => {
       logger.debug('Handler options:', options);
       const handler = getHandler(options);
@@ -98,7 +108,9 @@ describe('Activation (unit)', () => {
       logger.debug('Invoking type handler');
 
       const typeHandler = formats[type];
-      logger.debug('Type handler', typeHandler);
+      // XXX: Apparently Winston logger invokes the typeHandler here
+      //      so we can't print it out without errors.
+      // logger.debug('Type handler', typeHandler);
       typeHandler();
 
       logger.debug('Waiting for async resolution');
@@ -127,7 +139,7 @@ describe('Activation (unit)', () => {
           }
         }
 
-        const testInstance = testClass(mockRouter, logger);
+        const testInstance = testClass(mockRouter, db, logger);
       });
     });
 
