@@ -2,13 +2,13 @@
 'use strict';
 
 const _ = require('underscore');
-
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const logger = require('../util').logger;
 const mongoClient = require('mongodb').MongoClient;
+
+const logger = require('../util').logger;
 
 const basename  = path.basename(module.filename);
 
@@ -30,8 +30,7 @@ const associateModels = (db) => {
       // we can swap out the backend as we want
 
       db[capitalizedName] = db.collection(name);
-      db[capitalizedName].upsert = (data) => {
-        logger.error(data);
+      db[capitalizedName].upsert = (data, options) => {
         return new Promise((fulfill, reject) => {
             delete(data.createdAt);
             delete(data.updatedAt);
@@ -42,15 +41,26 @@ const associateModels = (db) => {
             data.createdAt = new Date().toISOString();
             data.updatedAt = new Date().toISOString();
 
-            db[capitalizedName].update(searchQuery,
-                                       data,
-                                       { upsert: true },
-                                       (err, results) => {
-              logger.debug('Inserting into ' + capitalizedName + ':', data);
+
+            // TODO: Use update instead of findAndModify for big records (i.e. Pings)
+            //       since this will return the whole thing.
+            db[capitalizedName].findAndModify(searchQuery,
+                                              undefined,
+                                              data,
+                                              { upsert: true,
+                                                w: 'majority',
+                                                'new': true },
+                                              (err, result) => {
+              logger.debug('Upserted into ' + capitalizedName + ':',
+                           JSON.stringify(data));
+
+              logger.silly('Upsert into ' + capitalizedName + ' with ObjectID:',
+                           result.value._id.toString());
+
               if (err) {
                 reject(err);
               } else {
-                fulfill(results);
+                fulfill(result.value._id);
               }
             });
         });

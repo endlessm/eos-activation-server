@@ -4,6 +4,7 @@
 const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
+const pingConfigurationMapper = require('../util/ping_configuration_mapper');
 
 // Overridable on import of this module
 let db;
@@ -33,12 +34,29 @@ const ping = (router, logger) => {
   const insertPingRecord = (res, record) => {
     logger.info('Ping attempt:', record);
 
-    db.Ping.upsert(record)
-                 .then((changed) => {
-      logger.info('Ping saved:', record);
+    // XXX: Passing in DB isn't the best but we don't want to init
+    //      it each time out config manager is invoked and doing
+    //      this in other async ways would be pretty tricky.
+    pingConfigurationMapper.getIdFor(db, record).then((config_id) => {
+      logger.debug('Configuration id:', config_id.toString());
+      var pingRecord = {};
+      // TODO: Increment total ping count
 
-      res.status(200)
-         .json({ success: true });
+      const currentDate = new Date();
+      pingRecord.year = currentDate.getUTCFullYear();
+      pingRecord.month = currentDate.getUTCMonth();
+      pingRecord.day = currentDate.getUTCDate();
+
+      pingRecord.config_id = config_id;
+      pingRecord.count = "1";  // Append?
+
+      db.Ping.upsert(pingRecord)
+                   .then((changed) => {
+        logger.info('Ping saved:', JSON.stringify(pingRecord));
+
+        res.status(200)
+           .json({ success: true });
+      });
     }).catch((err) => {
       logger.error(err);
 
@@ -84,8 +102,6 @@ const ping = (router, logger) => {
 
           // Store 3-letter code vs 2-letter one
           ping.country = countries.alpha2ToAlpha3(geoLookup.country);
-          ping.region = geoLookup.region;
-          ping.city = geoLookup.city;
         }
 
         insertPingRecord(res, ping);
