@@ -26,9 +26,41 @@ const associateModels = (db) => {
       const name = file.slice(0, -9);
       const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
 
+      // Handle indexes in sequelize format
+      const schemaModule = require(path.join(__dirname, '..', 'models', file));
+      const sequelizeMock = {
+        define: (name, schema, options) => {
+          return { name: name,
+                   schema: schema,
+                   options: options };
+        },
+        STRING: "string",
+        INTEGER: "integer",
+        DATEONLY: "dateonly",
+        ARRAY: (type) => {}
+      }
+      const model = schemaModule(sequelizeMock, sequelizeMock);
+      const indexes = model.options.indexes;
+      for (var index of indexes) {
+        logger.silly(capitalizedName + " index found:", index);
+        const mappedIndex = index.fields.map((field) => {
+          var indexField = {};
+          indexField[field] = 1;
+          return indexField;
+        });
+        logger.silly(mappedIndex);
+
+        db.ensureIndex(capitalizedName,
+                       mappedIndex,
+                       { sparse: true,
+                         background: true },
+                       (err, name) => {
+          logger.silly("Bacground create of " + capitalizedName + " index: " + name);
+        })
+      }
+
       // Transform the Mongo backend to sequelize-ish interface so that
       // we can swap out the backend as we want
-
       db[capitalizedName] = db.collection(name);
       db[capitalizedName].upsert = (data, options) => {
         return new Promise((fulfill, reject) => {
