@@ -6,6 +6,7 @@ const _ = require('underscore');
 const logger = require('../util').logger;
 
 const IGNORED_FIELDS = [ 'count',
+                         'country',
                          'release' ];
 
 const getIdFor = (db, record) => {

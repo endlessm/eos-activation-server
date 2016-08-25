@@ -9,26 +9,18 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
-    date: DataTypes.DATEONLY,
-    image: DataTypes.STRING,
-    vendor: DataTypes.STRING,
-    product: DataTypes.STRING,
-    release: DataTypes.STRING,
+    count: DataTypes.INTEGER,
     country: DataTypes.STRING,
-    count: DataTypes.ARRAY(DataTypes.INTEGER), //psql-specific
+    config_ids: DataTypes.ARRAY(DataTypes.ID) // No representation for SQL of this
   }, {
     timestamps: true,
     paranoid: false,
     freezeTableName: true,
-    tableName: 'ping',
+    tableName: 'Ping_$DATE',
     indexes: [
-      { fields: ['date']     },
-      { fields: ['image']     },
-      { fields: ['vendor']    },
-      { fields: ['product']   },
-      { fields: ['release']   },
-      { fields: ['country']   },
-      { fields: ['count']     }
+      { fields: ['count']      },
+      { fields: ['country']    },
+      { fields: ['config_ids'] }
     ]
   });
 };

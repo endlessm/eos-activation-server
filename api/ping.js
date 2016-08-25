@@ -50,7 +50,7 @@ const ping = (router, logger) => {
       pingRecord.config_id = config_id;
       pingRecord.count = "1";  // Append?
 
-      db.Ping.upsert(pingRecord)
+      db.Ping().upsert(pingRecord)
                    .then((changed) => {
         logger.info('Ping saved:', JSON.stringify(pingRecord));
 

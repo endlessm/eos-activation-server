@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     paranoid: false,
     freezeTableName: true,
-    tableName: 'activation',
+    tableName: 'Activation',
     indexes: [
       { fields: ['image']     },
       { fields: ['vendor']    },

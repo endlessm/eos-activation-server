@@ -11,18 +11,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: DataTypes.STRING,
     vendor: DataTypes.STRING,
-    product: DataTypes.STRING,
-    country: DataTypes.STRING
+    product: DataTypes.STRING
   }, {
     timestamps: true,
     paranoid: false,
     freezeTableName: true,
-    tableName: 'configuration',
+    tableName: 'Configuration',
     indexes: [
       { fields: ['image']   },
       { fields: ['vendor']  },
-      { fields: ['product'] },
-      { fields: ['country'] }
+      { fields: ['product'] }
     ]
   });
 };
