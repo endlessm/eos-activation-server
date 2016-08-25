@@ -52,7 +52,8 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
     const tableName = getTableName(rawTableName);
 
     logger.debug("Generating API for DB:", tableName);
-    var collection = db.collection(tableName);
+    const baseCollection = db.collection(tableName);
+    var collection = {};
 
     collection.upsert = (data, options) => {
       return new Promise((fulfill, reject) => {
@@ -68,13 +69,13 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
 
           // TODO: Use update instead of findAndModify for big records (i.e. Pings)
           //       since this will return the whole thing.
-          collection.findAndModify(searchQuery,
-                                   undefined,
-                                   data,
-                                   { upsert: true,
-                                     w: 'majority',
-                                     'new': true },
-                                   (err, result) => {
+          baseCollection.findAndModify(searchQuery,
+                                       undefined,
+                                       data,
+                                       { upsert: true,
+                                         w: 'majority',
+                                         'new': true },
+                                       (err, result) => {
             logger.debug('Upserted into ' + datasetName + ':',
                          JSON.stringify(data));
 
@@ -90,6 +91,18 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
       });
     }
 
+    collection.create = (data) => {
+      return new Promise((fulfill, reject) => {
+        baseCollection.insert(data, { w: 'majority' }, (err, results) => {
+          if (err) {
+            reject(err);
+          } else {
+            fulfill();
+          }
+        });
+      });
+    }
+
     // NoSQL doesn't need to really create any tables beforehand
     collection.sync = (options) => {
       return new Promise((fulfill, reject) => {
@@ -97,11 +110,11 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
           fulfill();
         } else {
           logger.warn("Clear of DB requested:", datasetName);
-          collection.deleteMany({}, (err, results) => {
+          baseCollection.deleteMany({}, (err, result) => {
             if (err) {
               reject(err);
             } else {
-              fulfill();
+              fulfill(result);
             }
           });
         }
@@ -112,7 +125,7 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
       return new Promise((fulfill, reject) => {
         logger.debug("Finding all items in", datasetName);
 
-        const cursor = collection.find();
+        const cursor = baseCollection.find();
 
         cursor.toArray((err, docs) => {
           if (err) {

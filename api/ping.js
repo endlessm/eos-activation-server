@@ -42,16 +42,13 @@ const ping = (router, logger) => {
       var pingRecord = {};
       // TODO: Increment total ping count
 
-      const currentDate = new Date();
-      pingRecord.year = currentDate.getUTCFullYear();
-      pingRecord.month = currentDate.getUTCMonth();
-      pingRecord.day = currentDate.getUTCDate();
-
       pingRecord.config_id = config_id;
-      pingRecord.count = "1";  // Append?
+      pingRecord.country = record.country;
+      pingRecord.count = record.count;
 
-      db.Ping().upsert(pingRecord)
-                   .then((changed) => {
+      // XXX: NoSQL-only method for now
+      db.Ping().create(pingRecord)
+                .then((result) => {
         logger.info('Ping saved:', JSON.stringify(pingRecord));
 
         res.status(200)

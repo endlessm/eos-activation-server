@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     indexes: [
       { fields: ['count']      },
       { fields: ['country']    },
-      { fields: ['config_ids'] }
+      { fields: ['config_id']  }
     ]
   });
 };
