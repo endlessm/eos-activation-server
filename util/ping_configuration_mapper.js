@@ -5,16 +5,14 @@ const _ = require('underscore');
 
 const logger = require('../util').logger;
 
-const CONFIG_FIELDS = [ 'country',
-                        'vendor',
-                        'model',
-                        'image',
-                        'release' ];
+const IGNORED_FIELDS = [ 'count',
+                         'release' ];
 
 const getIdFor = (db, record) => {
-
   var configuration = _.clone(record);
-  delete configuration.count;
+  for (var fieldName of IGNORED_FIELDS) {
+    delete configuration[fieldName];
+  }
 
   logger.silly("Trying to find config id for", configuration);
 

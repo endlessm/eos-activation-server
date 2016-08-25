@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
     vendor: DataTypes.STRING,
     product: DataTypes.STRING,
-    release: DataTypes.STRING,
     country: DataTypes.STRING
   }, {
     timestamps: true,
@@ -23,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
       { fields: ['image']   },
       { fields: ['vendor']  },
       { fields: ['product'] },
-      { fields: ['release'] },
       { fields: ['country'] }
     ]
   });
