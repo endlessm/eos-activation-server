@@ -22,9 +22,8 @@ const associateModels = (db) => {
       return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-9) === '.model.js');
     })
     .forEach(function(file) {
-      // Strip '.model.js'
-      const name = file.slice(0, -9);
-      const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+      let datasetName;
+      let tableName
 
       // Handle indexes in sequelize format
       const schemaModule = require(path.join(__dirname, '..', 'models', file));
@@ -40,9 +39,13 @@ const associateModels = (db) => {
         ARRAY: (type) => {}
       }
       const model = schemaModule(sequelizeMock, sequelizeMock);
+
+      // Set names. We currently want to keep CamelCase for collections though
+      datasetName = model.name;
+
       const indexes = model.options.indexes;
       for (var index of indexes) {
-        logger.silly(capitalizedName + " index found:", index);
+        logger.silly(datasetName + " index found:", index);
         const mappedIndex = index.fields.map((field) => {
           var indexField = {};
           indexField[field] = 1;
@@ -50,19 +53,19 @@ const associateModels = (db) => {
         });
         logger.silly(mappedIndex);
 
-        db.ensureIndex(capitalizedName,
+        db.ensureIndex(datasetName,
                        mappedIndex,
                        { sparse: true,
                          background: true },
                        (err, name) => {
-          logger.silly("Bacground create of " + capitalizedName + " index: " + name);
+          logger.silly("Bacground create of " + datasetName + " index: " + name);
         })
       }
 
       // Transform the Mongo backend to sequelize-ish interface so that
       // we can swap out the backend as we want
-      db[capitalizedName] = db.collection(name);
-      db[capitalizedName].upsert = (data, options) => {
+      db[datasetName] = db.collection(datasetName);
+      db[datasetName].upsert = (data, options) => {
         return new Promise((fulfill, reject) => {
             delete(data.createdAt);
             delete(data.updatedAt);
@@ -76,17 +79,17 @@ const associateModels = (db) => {
 
             // TODO: Use update instead of findAndModify for big records (i.e. Pings)
             //       since this will return the whole thing.
-            db[capitalizedName].findAndModify(searchQuery,
+            db[datasetName].findAndModify(searchQuery,
                                               undefined,
                                               data,
                                               { upsert: true,
                                                 w: 'majority',
                                                 'new': true },
                                               (err, result) => {
-              logger.debug('Upserted into ' + capitalizedName + ':',
+              logger.debug('Upserted into ' + datasetName + ':',
                            JSON.stringify(data));
 
-              logger.silly('Upsert into ' + capitalizedName + ' with ObjectID:',
+              logger.silly('Upsert into ' + datasetName + ' with ObjectID:',
                            result.value._id.toString());
 
               if (err) {
@@ -99,13 +102,13 @@ const associateModels = (db) => {
       }
 
       // NoSQL doesn't need to really create any tables beforehand
-      db[capitalizedName].sync = (options) => {
+      db[datasetName].sync = (options) => {
         return new Promise((fulfill, reject) => {
           if (options.force && options.force != true) {
             fulfill();
           } else {
-            logger.warn("Clear of DB requested:", capitalizedName);
-            db[capitalizedName].deleteMany({}, (err, results) => {
+            logger.warn("Clear of DB requested:", datasetName);
+            db[datasetName].deleteMany({}, (err, results) => {
               if (err) {
                 reject(err);
               } else {
@@ -116,11 +119,11 @@ const associateModels = (db) => {
         });
       }
 
-      db[capitalizedName].findAndCountAll = (options) => {
+      db[datasetName].findAndCountAll = (options) => {
         return new Promise((fulfill, reject) => {
-          logger.debug("Finding all items in", capitalizedName);
+          logger.debug("Finding all items in", datasetName);
 
-          const cursor = db[capitalizedName].find();
+          const cursor = db[datasetName].find();
 
           cursor.toArray((err, docs) => {
             if (err) {
@@ -133,7 +136,7 @@ const associateModels = (db) => {
         });
       }
 
-      logger.debug('Associated model: ' + capitalizedName);
+      logger.debug('Associated model: ' + datasetName);
     });
 }
 
