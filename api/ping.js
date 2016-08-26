@@ -58,7 +58,7 @@ const ping = (router, logger) => {
 
       // XXX: NoSQL-only method for now
       db.Ping().create(pingRecord)
-                .then((result) => {
+               .then((result) => {
         logger.info('Ping saved:', JSON.stringify(pingRecord));
 
         res.status(200)

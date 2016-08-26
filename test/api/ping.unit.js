@@ -17,7 +17,7 @@ const helpers = require('../util/unit_test_helpers');
 
 let db;
 
-describe('Activation (unit)', () => {
+describe('Ping (unit)', () => {
   before((done) => {
     dbDriver((database) => {
       db = database;
@@ -25,19 +25,14 @@ describe('Activation (unit)', () => {
     });
   });
 
-  const testClass = require('../../api/activation');
+  const testClass = require('../../api/ping');
 
   let goodParams;
 
   const testHandler = (params, options, done, testCallback) => {
     helpers.invokeHandler(testClass, db, params, options).then((response) => {
       testCallback(response);
-
-      if (options === undefined ||
-          options['skip_done'] === undefined ||
-          options.skip_done === false) {
-        done();
-      }
+      done();
     })
     .catch(done);
   };
@@ -48,16 +43,16 @@ describe('Activation (unit)', () => {
                      vendor: 'vendor',
                      product: 'product',
                      release: 'release',
-                     live: true };
+                     count: 100 };
       done();
     });
 
     describe('routing', ()  => {
-      it('adds the activation route', (done) => {
+      it('adds the ping route', (done) => {
         let mockRouter = {
           routes: {},
           put: (endpoint, func) => {
-            expect(endpoint).to.be.equal('/v1/activate');
+            expect(endpoint).to.be.equal('/v1/ping');
             done();
           }
         }
@@ -75,7 +70,7 @@ describe('Activation (unit)', () => {
       });
 
       it('of bad json is not accepted', (done) => {
-        testHandler("{ 'testing': ", undefined, done, (response) => {
+        testHandler("testing", undefined, done, (response) => {
           expect(response.body.success).to.be.eql(false);
           expect(response.status).to.be.equal(400);
         });
@@ -133,36 +128,12 @@ describe('Activation (unit)', () => {
         });
       });
 
-    });
+      it('should fail if count is not included', (done) => {
+        delete goodParams.count;
 
-    describe('hooks', () => {
-      it('are invoked correctly', (done) => {
-        let hook = (record) => {
-          expect(record).to.be.not.equal(undefined);
-
-          for (let prop in goodParams) {
-            expect(record).to.have.property(prop);
-            expect(record[prop]).to.be.eql(goodParams[prop]);
-          }
-
-          done();
-        }
-
-        testHandler(goodParams, { hook: hook , skip_done: true }, (response) => {
-          expect(response.body.success).to.be.eql(true);
-          expect(response.status).to.be.equal(200);
-        });
-      });
-
-      it('aren\'t invoked when data is bad', (done) => {
-        delete goodParams.image;
-        let hook = (record) => {
-          done(new Error('Should not have gotten here'));
-        }
-
-        testHandler(goodParams, { hook: hook }, done, (response) => {
-          // Sanity check
-          expect(response.body.success).to.not.be.eql(true);
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
         });
       });
     });
