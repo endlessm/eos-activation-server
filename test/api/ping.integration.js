@@ -28,6 +28,8 @@ describe('Ping (integration)', () => {
   const HOST = 'localhost:3030';
 
   let goodParams;
+  let configurationFields;
+  let pingFields;
 
   const errorHandler = (err, res) => {
     if (err) {
@@ -168,7 +170,7 @@ describe('Ping (integration)', () => {
       });
     });
 
-    xdescribe('data persistence', ()  => {
+    describe('data persistence', ()  => {
       let image =   'image '   + Math.random();
       let vendor =  'vendor '  + Math.random();
       let product = 'product ' + Math.random();
@@ -176,15 +178,23 @@ describe('Ping (integration)', () => {
       let count = Math.floor((Math.random() * 100000) + 1);
 
       beforeEach((done) => {
+        configurationFields = ['image',
+                               'vendor',
+                               'product' ];
+
+        pingFields = ['country',
+                      'count' ];
+
         goodParams = { image: image,
                        vendor: vendor,
                        product: product,
                        release: release,
-                       serial: serial,
-                       live: live };
+                       count: count };
 
-        db.Ping.sync({ force : true }).then(() => {
-          done();
+        db.Ping().sync({ force : true }).then(() => {
+          db.Configuration.sync({ force : true }).then(() => {
+            done();
+          });
         });
       });
 
@@ -200,31 +210,46 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Ping.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
+              db.Configuration.findAndCountAll().then((configurations) => {
+                expect(configurations.count).to.equal(1);
+                const configuration = configurations.rows[0];
 
-                const pingRecord = result.rows[0];
-                for (let prop in goodParams) {
-                  expect(pingRecord[prop]).to.eql(goodParams[prop]);
+                expect(configuration).to.have.property('createdAt');
+                expect(configuration).to.have.property('updatedAt');
+                expect(isExpectedDate(new Date(configuration.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(configuration.updatedAt))).to.equal(true);
+
+                expect(configuration).to.have.property('image');
+                expect(configuration).to.have.property('vendor');
+                expect(configuration).to.have.property('product');
+                for (let prop in configurationFields) {
+                  expect(configuration[prop]).to.eql(goodParams[prop]);
                 }
 
-                expect(pingRecord).to.have.property('createdAt');
-                expect(pingRecord).to.have.property('updatedAt');
-                expect(pingRecord).to.have.property('country');
-                expect(pingRecord).to.have.property('region');
-                expect(pingRecord).to.have.property('city');
-                expect(pingRecord).to.have.property('latitude');
-                expect(pingRecord).to.have.property('longitude');
+                db.Ping().findAndCountAll().then((result) => {
+                  expect(result.count).to.equal(1);
 
-                expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
-                expect(pingRecord.country).to.equal('USA');
-                expect(pingRecord.region).to.equal('CA');
-                expect(pingRecord.city).to.equal('San Francisco');
-                expect(pingRecord.latitude).to.eql(37.7758);
-                expect(pingRecord.longitude).to.eql(-122.4128);
+                  const pingRecord = result.rows[0];
 
-                done();
+                  expect(pingRecord).to.have.property('createdAt');
+                  expect(pingRecord).to.have.property('updatedAt');
+                  expect(pingRecord).to.have.property('count');
+                  expect(pingRecord).to.have.property('country');
+                  expect(pingRecord).to.have.property('config_id');
+
+                  expect(pingRecord.country).to.equal('USA');
+                  expect(pingRecord.count).to.equal(count);
+                  expect(pingRecord.config_id).to.eql(configuration._id);
+                  expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
+                  expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
+
+                  done();
+                })
+                .catch((err) => {
+                  done(err);
+                });
+              }).catch((err) => {
+                done(err);
               });
            });
       });
@@ -241,11 +266,14 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Ping.findAndCountAll().then((result) => {
+              db.Ping().findAndCountAll().then((result) => {
                 expect(result.count).to.equal(1);
                 expect(result.rows[0].country).to.eql('USA');
 
                 done();
+              })
+              .catch((err) => {
+                done(err);
               });
            });
       });
@@ -268,11 +296,11 @@ describe('Ping (integration)', () => {
                .expect(200);
           })
           .then((res) => {
-             db.Ping.findAndCountAll()
+             db.Ping().findAndCountAll()
                .then((result) => {
                  expect(result.count).to.equal(2);
-                 expect(result.rows[0].serial).to.eql(serial);
-                 expect(result.rows[1].serial).to.eql(serial);
+                 expect(result.rows[0].count).to.eql(count);
+                 expect(result.rows[1].count).to.eql(count);
 
                  done();
                })
@@ -300,23 +328,33 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Ping.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
+              db.Configuration.findAndCountAll().then((configurations) => {
+                expect(configurations.count).to.equal(1);
+                const configuration = configurations.rows[0];
 
-                for (let prop in goodParams) {
-                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
-                }
+                expect(configuration).to.have.property('createdAt');
+                expect(configuration).to.have.property('updatedAt');
+                expect(isExpectedDate(new Date(configuration.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(configuration.updatedAt))).to.equal(true);
 
-                var timeAfterRequest = new Date();
-                timeAfterRequest.setMinutes(timeAfterRequest.getMinutes() + 1);
+                db.Ping().findAndCountAll().then((result) => {
+                  expect(result.count).to.equal(1);
 
-                expect(result.rows[0]).to.have.property('createdAt');
-                expect(result.rows[0]).to.have.property('updatedAt');
+                  const pingRecord = result.rows[0];
 
-                expect(isExpectedDate(new Date(result.rows[0].createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(result.rows[0].updatedAt))).to.equal(true);
+                  expect(pingRecord).to.have.property('createdAt');
+                  expect(pingRecord).to.have.property('updatedAt');
 
-                done();
+                  expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
+                  expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
+
+                  done();
+                })
+                .catch((err) => {
+                  done(err);
+                });
+              }).catch((err) => {
+                done(err);
               });
            });
       });

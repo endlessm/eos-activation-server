@@ -93,6 +93,9 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
 
     collection.create = (data) => {
       return new Promise((fulfill, reject) => {
+        data.createdAt = new Date().toISOString();
+        data.updatedAt = new Date().toISOString();
+
         baseCollection.insert(data, { w: 'majority' }, (err, results) => {
           if (err) {
             reject(err);

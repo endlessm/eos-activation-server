@@ -31,6 +31,16 @@ const ping = (router, logger) => {
                  'count']
   }
 
+  const handleError = (res, err) => {
+    logger.error(err);
+
+    res.status(500)
+       .json({ error: err.toString(),
+               success: false });
+
+    throw err;
+  }
+
   const insertPingRecord = (res, record) => {
     logger.info('Ping attempt:', record);
 
@@ -53,15 +63,11 @@ const ping = (router, logger) => {
 
         res.status(200)
            .json({ success: true });
+      }).catch((err) => {
+        handleError(res, err);
       });
     }).catch((err) => {
-      logger.error(err);
-
-      res.status(500)
-         .json({ error: err.toString(),
-                 success: false });
-
-      throw err;
+        handleError(res, err);
     });
   }
 
