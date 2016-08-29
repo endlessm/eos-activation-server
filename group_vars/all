@@ -1,0 +1,5 @@
+---
+aws_region: us-west-2
+server_key: eos-activation-service
+
+database_volume_drive: sdf

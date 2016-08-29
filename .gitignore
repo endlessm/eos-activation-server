@@ -4,6 +4,9 @@ packer_*.zip
 packer_build.log
 packer_latest
 
+# Ansible dir
+ansible/
+
 # Test results
 reports/*
 
