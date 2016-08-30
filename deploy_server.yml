@@ -48,7 +48,7 @@
     - set_fact:
         database_volume="{{ item.id }}"
         aws_zone="{{ item.zone }}"
-      when: 'item.attachment_set.device.endswith("{{ database_volume_drive }}")'
+      when: 'not item.attachment_set.device.endswith("sda1")'
       with_items: "{{ volume_listing.volumes | to_json }}"
 
     - debug: msg="Database Volume '{{ database_volume }}'"
@@ -90,7 +90,6 @@
       ec2_vol:
         instance: "{{ new_instance_id }}"
         id: "{{ database_volume }}"
-        device_name: "{{ database_volume_drive }}"
 
     - name: Restarting instance
        ec2:
