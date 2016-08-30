@@ -1,0 +1,106 @@
+# vim:ff=unix ts=2 sw=2 expandtab
+---
+
+- hosts: all
+  connection: local
+  gather_facts: False
+
+  tasks:
+    - set_fact: server_ami="{{ lookup('file', './ami_image.txt') | replace('\n', '') }}"
+    - debug: msg="Using AMI '{{ server_ami }}'"
+
+    - name: Fetching current DNS entry (to match up the elastic IP)
+      command: dig +short home.endlessm.com
+      register: dns_result
+      when: server_elastic_ip is not defined
+
+    - name: Setting the search IP
+      set_fact: server_elastic_ip="{{ dns_result.stdout }}"
+      when: server_elastic_ip is not defined
+
+    - name: Fetching current deployment commit
+      command: git rev-parse HEAD
+      args:
+        warn: no
+      register: git_deploy_commit_result
+
+    - name: Setting the deployment commit ID
+      set_fact: deploy_commit="{{ git_deploy_commit_result.stdout }}"
+
+    - name: Getting current deployment info
+      ec2_remote_facts:
+        filters:
+          ip-address: "{{ server_elastic_ip }}"
+          key_name: "{{ server_key }}"
+        region: "{{ aws_region }}"
+      register: ec2_instances
+
+    - set_fact: old_instance_id="{{ ec2_instances.instances[0].id }}"
+
+    - debug: msg="Old instance '{{ old_instance_id }}'"
+
+    - ec2_vol:
+        instance: "{{ old_instance_id }}"
+        state: list
+        region: "{{ aws_region }}"
+      register: volume_listing
+
+    - set_fact:
+        database_volume="{{ item.id }}"
+        aws_zone="{{ item.zone }}"
+      when: 'item.attachment_set.device.endswith("{{ database_volume_drive }}")'
+      with_items: "{{ volume_listing.volumes | to_json }}"
+
+    - debug: msg="Database Volume '{{ database_volume }}'"
+    - debug: msg="Database Volume Zone '{{ aws_zone }}'"
+
+    - name: Provisioning new instance
+      ec2:
+        region: "{{ aws_region }}"
+        image: "{{ server_ami }}"
+        key_name: "{{ server_key }}"
+        instance_type: "{{ instance_type | default('t2.medium', False) }}"
+        assign_public_ip: no
+        instance_tags:
+          Name: eos-activation-server
+          AMI: "{{ server_ami }}"
+          DeployCommit: "{{ deploy_commit }}"
+        # TODO: Use user data to set git token
+        # user_data:
+        termination_protection: yes
+        wait: yes
+        wait_timeout: 500
+        zone: "{{ aws_zone }}"
+      register: provisioning_result
+
+    - set_fact: new_instance_id={{ provisioning_result.instance_ids[0] }}
+
+    - debug: msg="New instance '{{ new_instance_id }}'"
+
+    - name: Shutting down old instance
+      ec2:
+        state: absent
+        instance_ids:
+          - "{{ old_instance_id }}"
+        wait: yes
+        wait_timeout: 500
+
+    - name: Attaching old volume to new instance
+      ec2_vol:
+        instance: "{{ new_instance_id }}"
+        id: "{{ database_volume }}"
+        device_name: "{{ database_volume_drive }}"
+
+    - name: Restarting instance
+       ec2:
+         instance_ids: "{{ new_instance_id }}"
+         # Requires Ansible 2.2.0+
+         state: restarted
+         wait: yes
+         wait_timeout: 500
+
+    - name: Forwarding the elastic IP to the new instance
+     ec2_eip:
+      - public_ip: "{{ server_elastic_ip }}"
+      - device_id: "{{ new_instance_id }}"
+      - reuse_existing_ip_allowed: yes
