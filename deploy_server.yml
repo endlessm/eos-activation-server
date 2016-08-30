@@ -61,6 +61,7 @@
         key_name: "{{ server_key }}"
         instance_type: "{{ instance_type | default('t2.medium', False) }}"
         assign_public_ip: no
+        group: "eos-activation-server"
         instance_tags:
           Name: eos-activation-server
           AMI: "{{ server_ami }}"
