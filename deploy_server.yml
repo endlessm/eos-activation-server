@@ -78,29 +78,50 @@
 
     - debug: msg="New instance '{{ new_instance_id }}'"
 
+    # XXX: Ansible doesn't have a way to do this through EC module yet
+    - name: Disabling shutdown protection on old instance
+      command: >
+        aws ec2 modify-instance-attribute
+          --region "{{ aws_region }}"
+          --instance-id "{{ old_instance_id }}"
+          --attribute disableApiTermination --value false
+
     - name: Shutting down old instance
       ec2:
-        state: absent
+        region: "{{ aws_region }}"
         instance_ids:
           - "{{ old_instance_id }}"
+        state: absent
         wait: yes
         wait_timeout: 500
 
     - name: Attaching old volume to new instance
       ec2_vol:
+        region: "{{ aws_region }}"
         instance: "{{ new_instance_id }}"
         id: "{{ database_volume }}"
 
-    - name: Restarting instance
-       ec2:
-         instance_ids: "{{ new_instance_id }}"
-         # Requires Ansible 2.2.0+
-         state: restarted
-         wait: yes
-         wait_timeout: 500
+      # XXX: Restarted state not in mainline even though it's in docs :/
+    - name: Restarting new instance (1/2)
+      ec2:
+        region: "{{ aws_region }}"
+        instance_ids: "{{ new_instance_id }}"
+        state: stopped
+        wait: yes
+        wait_timeout: 500
+
+    - name: Restarting new instance (2/2)
+      ec2:
+        region: "{{ aws_region }}"
+        instance_ids: "{{ new_instance_id }}"
+        state: running
+        wait: yes
+        wait_timeout: 500
 
     - name: Forwarding the elastic IP to the new instance
-     ec2_eip:
-      - public_ip: "{{ server_elastic_ip }}"
-      - device_id: "{{ new_instance_id }}"
-      - reuse_existing_ip_allowed: yes
+      ec2_eip:
+        region: "{{ aws_region }}"
+        public_ip: "{{ server_elastic_ip }}"
+        device_id: "{{ new_instance_id }}"
+        in_vpc: yes
+        reuse_existing_ip_allowed: yes
