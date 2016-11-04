@@ -22,7 +22,8 @@ const ping = (router, logger) => {
       'product': { 'type': 'string' },
       'release': { 'type': 'string' },
       'count':   { 'type': 'integer',
-                   'minimum': 0 }
+                   'minimum': 0 },
+      'dualboot':{ 'type': 'boolean'}
     },
     'required': ['image',
                  'vendor',

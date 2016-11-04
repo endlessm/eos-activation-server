@@ -92,6 +92,24 @@ describe('Ping (unit)', () => {
         });
       });
 
+      it('should not fail if dualboot flag is false', (done) => {
+        goodParams.dualboot = false;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
+      it('should not fail if dualboot flag is true', (done) => {
+        goodParams.dualboot = true;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
       it('should fail if image name is not included', (done) => {
         delete goodParams.image;
 

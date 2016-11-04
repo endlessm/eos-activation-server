@@ -97,6 +97,25 @@ describe('Activation (unit)', () => {
         });
       });
 
+      it('should not fail if live param is omitted', (done) => {
+        delete goodParams.live;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
+      it('should not fail if dualboot param is included', (done) => {
+        delete goodParams.live;
+        goodParams.dualboot = true;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
       it('should fail if image name is not included', (done) => {
         delete goodParams.image;
 

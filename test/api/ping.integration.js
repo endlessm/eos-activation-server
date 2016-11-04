@@ -176,6 +176,10 @@ describe('Ping (integration)', () => {
       let product = 'product ' + Math.random();
       let release = 'release ' + Math.random();
       let count = Math.floor((Math.random() * 100000) + 1);
+      let dualboot_ = Math.random();
+      let dualboot = dualboot_ < 0.33 ? undefined :
+                     dualboot_ < 0.66 ? false :
+                     true;
 
       beforeEach((done) => {
         configurationFields = ['image',
@@ -189,7 +193,8 @@ describe('Ping (integration)', () => {
                        vendor: vendor,
                        product: product,
                        release: release,
-                       count: count };
+                       count: count,
+                       dualboot: dualboot };
 
         db.Ping().sync({ force : true }).then(() => {
           db.Configuration.sync({ force : true }).then(() => {
@@ -224,6 +229,11 @@ describe('Ping (integration)', () => {
                 expect(configuration).to.have.property('product');
                 for (let prop in configurationFields) {
                   expect(configuration[prop]).to.eql(goodParams[prop]);
+                }
+                if (dualboot) {
+                  expect(configuration.dualboot).to.eql(dualboot);
+                } else {
+                  expect(configuration).not.to.have.property('dualboot')
                 }
 
                 db.Ping().findAndCountAll().then((result) => {

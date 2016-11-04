@@ -16,7 +16,8 @@ Server that logs all activation pings by the clients in hte database and sends s
       'product': { 'type': 'string' },
       'serial':  { 'type': 'string' },
       'release': { 'type': 'string' },
-      'live':    { 'type': 'boolean' }
+      'live':    { 'type': 'boolean' },
+      'dualboot':{ 'type': 'boolean' }
     },
     'required': ['image',
                  'vendor',
