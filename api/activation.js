@@ -22,7 +22,8 @@ const activation = (router, logger) => {
       'product': { 'type': 'string' },
       'serial':  { 'type': 'string' },
       'release': { 'type': 'string' },
-      'live':    { 'type': 'boolean' }
+      'live':    { 'type': 'boolean' },
+      'dualboot':{ 'type': 'boolean' }
     },
     'required': ['image',
                  'vendor',

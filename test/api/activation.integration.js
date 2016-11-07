@@ -170,7 +170,10 @@ describe('Activation (integration)', () => {
       let product = 'product ' + Math.random();
       let release = 'release ' + Math.random();
       let serial =  'serial '  + Math.random();
-      let live = Math.random() > 0.5 ? true : false;
+      // 1/3 chance each for live, dualboot, normal
+      let nature = Math.random();
+      let live = nature < 0.33;
+      let dualboot = nature > 0.67;
 
       beforeEach((done) => {
         goodParams = { image: image,
@@ -178,7 +181,8 @@ describe('Activation (integration)', () => {
                        product: product,
                        release: release,
                        serial: serial,
-                       live: live };
+                       live: live,
+                       dualboot: dualboot };
 
         db.Activation.sync({ force : true }).then(() => {
           done();
@@ -213,6 +217,8 @@ describe('Activation (integration)', () => {
                 expect(activationRecord).to.have.property('city');
                 expect(activationRecord).to.have.property('latitude');
                 expect(activationRecord).to.have.property('longitude');
+                expect(activationRecord).to.have.property('live');
+                expect(activationRecord).to.have.property('dualboot');
 
                 expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
                 expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
@@ -221,6 +227,8 @@ describe('Activation (integration)', () => {
                 expect(activationRecord.city).to.equal('San Francisco');
                 expect(activationRecord.latitude).to.eql(37.7758);
                 expect(activationRecord.longitude).to.eql(-122.4128);
+                expect(activationRecord.live).to.eql(live);
+                expect(activationRecord.dualboot).to.eql(dualboot);
 
                 done();
               });
