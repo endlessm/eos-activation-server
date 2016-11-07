@@ -2,4 +2,6 @@
   "vendor": "vendor",
   "product": "someproduct",
   "release": "release",
+  "live": false,
+  "dualboot": true,
   "count": 1 }
