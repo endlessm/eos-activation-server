@@ -1,6 +1,6 @@
 # eos-activation-server
 
-Server that logs all activation pings by the clients in hte database and sends separate activation data to vendor server as well.
+Server that logs all activation pings by the clients in the database and sends separate activation data to vendor server as well.
 
 ## Activation endpoint
 
