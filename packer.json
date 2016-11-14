@@ -13,7 +13,8 @@
             "ami_name": "eos-activation-server_{{ isotime \"2006-01-02_1504\" }}",
             "ami_description": "EOS Activation Server",
             "tags": {
-                "Name": "eos-activation-server_{{ isotime \"2006-01-02_1504\" }}"
+                "Name": "eos-activation-server_{{ isotime \"2006-01-02_1504\" }}",
+                "Group": "metrics"
             },
             "associate_public_ip_address": true
         }
