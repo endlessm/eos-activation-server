@@ -11,7 +11,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     count: DataTypes.INTEGER,
     country: DataTypes.STRING,
-    config_ids: DataTypes.ARRAY(DataTypes.ID) // No representation for SQL of this
+    config_ids: DataTypes.ARRAY(DataTypes.ID), // No representation for SQL of this
+    metrics_enabled: DataTypes.BOOLEAN,
+    metrics_environment: DataTypes.STRING,
   }, {
     timestamps: true,
     paranoid: false,
