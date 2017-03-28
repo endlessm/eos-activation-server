@@ -39,6 +39,38 @@
 
     - debug: msg="Old instance '{{ old_instance_id }}'"
 
+    # XXX: WARNING! Mongo has no authentication on the server config
+    #      so don't open 27017 to anything that isn't the aggregation
+    #      infrastructure
+    - ec2_group:
+        name: "eos-activation-server"
+        description: "Security group for the activation server"
+        region: "{{ aws_region }}"
+        rules:
+          - cidr_ip: 0.0.0.0/0          # Allow SSH from anywhere
+            proto: tcp
+            from_port: 22
+            to_port: 22
+          - cidr_ip: 0.0.0.0/0          # Allow HTTP from anywhere
+            proto: tcp
+            to_port: 80
+            from_port: 80
+          - cidr_ip: 0.0.0.0/0          # Allow HTTPS from anywhere
+            proto: tcp
+            to_port: 443
+            from_port: 443
+          - cidr_ip: 52.25.206.231/32   # Mongo to HDP server (external)
+            proto: tcp
+            from_port: 27017
+            to_port: 27017
+          - cidr_ip: 172.31.8.54/32     # Mongo to HDP server (internal)
+            proto: tcp
+            from_port: 27017
+            to_port: 27017
+        rules_egress:
+          - cidr_ip: 0.0.0.0/0
+            proto: all
+
     - ec2_vol:
         instance: "{{ old_instance_id }}"
         state: list
