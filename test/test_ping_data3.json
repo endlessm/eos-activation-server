@@ -1,0 +1,7 @@
+{ "image": "eosoem-foobar",
+  "vendor": "LLAMA COMPUTER INC.",
+  "product": "someproduct",
+  "release": "release",
+  "count": 3,
+  "metrics_enabled": false,
+  "metrics_environment": "testing" }
