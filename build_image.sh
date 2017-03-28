@@ -8,7 +8,7 @@ fi
 DEPLOYMENT_TOKEN="${1}"
 
 # Latest packer version - keep updated
-LATEST_VERSION=0.10.1
+LATEST_VERSION=0.12.3
 
 CURRENT_DIR=$(readlink -f $(dirname $0))
 
