@@ -10,7 +10,7 @@
     - debug: msg="Using AMI '{{ server_ami }}'"
 
     - name: Fetching current DNS entry (to match up the elastic IP)
-      command: dig +short home.endlessm.com
+      shell: dig home.endlessm.com A +short | grep -v '[^0-9a-f\.\:]'
       register: dns_result
       when: server_elastic_ip is not defined
 
