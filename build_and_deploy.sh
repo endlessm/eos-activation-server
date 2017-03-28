@@ -2,6 +2,9 @@
 
 CURRENT_DIR=$(readlink -f $(dirname $0))
 
+echo "WARNING! Make sure that the sysmgr key is in your agent!"
+read -rsp $'Press any key to continue...\n' -n 1 key
+
 # Setup Ansible - we want the latest
 ${CURRENT_DIR}/setup_ansible.sh
 
@@ -24,5 +27,6 @@ if $BUILD_IMAGES; then
   ${CURRENT_DIR}/build_image.sh "${GIT_TOKEN}"
 fi
 
-ansible-playbook -vi hosts \
-                 ${CURRENT_DIR}/deploy_server.yml
+ANSIBLE_CONFIG=${CURRENT_DIR}/ansible.cfg \
+  ANSIBLE_HOST_KEY_CHECKING=False \
+    ansible-playbook -vi hosts ${CURRENT_DIR}/deploy_server.yml
