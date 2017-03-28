@@ -16,6 +16,7 @@ const request = require("supertest-as-promised");
 let db;
 
 const logger = require('../../util').logger;
+const _ = require('underscore');
 
 describe('Ping (integration)', () => {
   before((done) => {
@@ -176,10 +177,7 @@ describe('Ping (integration)', () => {
       let product = 'product ' + Math.random();
       let release = 'release ' + Math.random();
       let count = Math.floor((Math.random() * 100000) + 1);
-      let dualboot_ = Math.random();
-      let dualboot = dualboot_ < 0.33 ? undefined :
-                     dualboot_ < 0.66 ? false :
-                     true;
+      let dualboot = _.sample([undefined, false, true]);
 
       beforeEach((done) => {
         configurationFields = ['image',
@@ -252,6 +250,9 @@ describe('Ping (integration)', () => {
                   expect(pingRecord.config_id).to.eql(configuration._id);
                   expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
                   expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
+
+                  expect(pingRecord).not.to.have.property('metrics_enabled');
+                  expect(pingRecord).not.to.have.property('metrics_environment');
 
                   done();
                 })
@@ -368,6 +369,35 @@ describe('Ping (integration)', () => {
               });
            });
       });
+
+      it('stores the metrics status', (done) => {
+        goodParams['metrics_enabled'] = true;
+        goodParams['metrics_environment'] = 'production';
+
+        request(HOST)
+          .put('/v1/ping')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Ping().findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+                expect(result.rows[0].metrics_enabled).to.eql(true);
+                expect(result.rows[0].metrics_environment).to.eql("production");
+
+                done();
+              })
+              .catch((err) => {
+                done(err);
+              });
+           });
+      });
+
     });
   });
 });

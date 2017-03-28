@@ -17,13 +17,15 @@ const ping = (router, logger) => {
   const ping_schema = {
     'type': 'object',
     'properties': {
-      'image':   { 'type': 'string' },
-      'vendor':  { 'type': 'string' },
-      'product': { 'type': 'string' },
-      'release': { 'type': 'string' },
-      'count':   { 'type': 'integer',
-                   'minimum': 0 },
-      'dualboot':{ 'type': 'boolean'}
+      'image':               { 'type': 'string' },
+      'vendor':              { 'type': 'string' },
+      'product':             { 'type': 'string' },
+      'release':             { 'type': 'string' },
+      'count':               { 'type': 'integer',
+                               'minimum': 0 },
+      'dualboot':            { 'type': 'boolean' },
+      'metrics_enabled':     { 'type': 'boolean' },
+      'metrics_environment': { 'type': 'string' },
     },
     'required': ['image',
                  'vendor',
@@ -56,6 +58,13 @@ const ping = (router, logger) => {
       pingRecord.config_id = config_id;
       pingRecord.country = record.country;
       pingRecord.count = record.count;
+
+      if (record.metrics_enabled !== undefined) {
+        pingRecord.metrics_enabled = record.metrics_enabled;
+      }
+      if (record.metrics_environment !== undefined) {
+        pingRecord.metrics_environment = record.metrics_environment;
+      }
 
       // XXX: NoSQL-only method for now
       db.Ping().create(pingRecord)

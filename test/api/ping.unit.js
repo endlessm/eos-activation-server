@@ -110,6 +110,36 @@ describe('Ping (unit)', () => {
         });
       });
 
+      it('should not fail if metrics are enabled', (done) => {
+        goodParams.metrics_enabled = true;
+        goodParams.metrics_environment = 'production';
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
+      it('should not fail if metrics are disabled', (done) => {
+        goodParams.metrics_enabled = false;
+        goodParams.metrics_environment = 'production';
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
+      it('should not fail if metrics environment is extraordinary', (done) => {
+        goodParams.metrics_enabled = true;
+        goodParams.metrics_environment = 'extraordinary';
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
+        });
+      });
+
       it('should fail if image name is not included', (done) => {
         delete goodParams.image;
 
@@ -148,6 +178,24 @@ describe('Ping (unit)', () => {
 
       it('should fail if count is not included', (done) => {
         delete goodParams.count;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
+        });
+      });
+
+      it('should fail if metrics_enabled is a non-boolean', (done) => {
+        goodParams.metrics_enabled = 'true';
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
+        });
+      });
+
+      it('should fail if metrics_enabled is a non-string', (done) => {
+        goodParams.metrics_environment = 42;
 
         testHandler(goodParams, undefined, done, (response) => {
           expect(response.body.success).to.be.eql(false);

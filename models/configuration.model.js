@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     image: DataTypes.STRING,
     vendor: DataTypes.STRING,
-    product: DataTypes.STRING
+    product: DataTypes.STRING,
+    dualboot: DataTypes.BOOLEAN,
   }, {
     timestamps: true,
     paranoid: false,
