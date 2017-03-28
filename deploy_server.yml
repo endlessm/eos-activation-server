@@ -118,7 +118,10 @@
           --instance-id "{{ old_instance_id }}"
           --attribute disableApiTermination --value false
 
-    - name: Shutting down old instance
+    # XXX: Try to shut down the instance before wiping it but we
+    #      currently can't since the volume doesn't want to detach on stop
+    #      Upstream: https://github.com/ansible/ansible/issues/4127
+    - name: Terminating the old instance
       ec2:
         region: "{{ aws_region }}"
         instance_ids:
