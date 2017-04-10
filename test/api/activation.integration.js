@@ -9,7 +9,7 @@ const chai = require('chai');
 chai.use(require('chai-datetime'));
 
 const expect = require('chai').expect;
-const request = require("supertest-as-promised");
+const request = require('supertest');
 
 const dbDriver = require('../../db');
 
@@ -203,32 +203,38 @@ describe('Activation (integration)', () => {
 
               logger.error("Finding matching records...");
               db.Activation.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
+                try {
+                  expect(result.count).to.equal(1);
 
-                const activationRecord = result.rows[0];
-                for (let prop in goodParams) {
-                  expect(activationRecord[prop]).to.eql(goodParams[prop]);
+                  const activationRecord = result.rows[0];
+                  for (let prop in goodParams) {
+                    expect(activationRecord[prop]).to.eql(goodParams[prop]);
+                  }
+
+                  expect(activationRecord).to.have.property('createdAt');
+                  expect(activationRecord).to.have.property('updatedAt');
+                  expect(activationRecord).to.have.property('country');
+                  expect(activationRecord).to.have.property('region');
+                  expect(activationRecord).to.have.property('city');
+                  expect(activationRecord).to.have.property('latitude');
+                  expect(activationRecord).to.have.property('longitude');
+                  expect(activationRecord).to.have.property('live');
+                  expect(activationRecord).to.have.property('dualboot');
+
+                  expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
+                  expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
+                  expect(activationRecord.country).to.equal('USA');
+                  expect(activationRecord.region).to.equal('CA');
+                  expect(activationRecord.city).to.equal('San Francisco');
+                  expect(activationRecord.latitude).to.be.within(36, 38);
+                  expect(activationRecord.longitude).to.be.within(-123, -121);
+                  expect(activationRecord.live).to.eql(live);
+                  expect(activationRecord.dualboot).to.eql(dualboot);
+                } catch(e) {
+                  done()
+                  logger.error(e);
+                  throw e;
                 }
-
-                expect(activationRecord).to.have.property('createdAt');
-                expect(activationRecord).to.have.property('updatedAt');
-                expect(activationRecord).to.have.property('country');
-                expect(activationRecord).to.have.property('region');
-                expect(activationRecord).to.have.property('city');
-                expect(activationRecord).to.have.property('latitude');
-                expect(activationRecord).to.have.property('longitude');
-                expect(activationRecord).to.have.property('live');
-                expect(activationRecord).to.have.property('dualboot');
-
-                expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
-                expect(activationRecord.country).to.equal('USA');
-                expect(activationRecord.region).to.equal('CA');
-                expect(activationRecord.city).to.equal('San Francisco');
-                expect(activationRecord.latitude).to.eql(37.7758);
-                expect(activationRecord.longitude).to.eql(-122.4128);
-                expect(activationRecord.live).to.eql(live);
-                expect(activationRecord.dualboot).to.eql(dualboot);
 
                 done();
               });

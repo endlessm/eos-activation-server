@@ -11,7 +11,7 @@ chai.use(require('chai-datetime'));
 const dbDriver = require('../../db');
 
 const expect = require('chai').expect;
-const request = require("supertest-as-promised");
+const request = require('supertest');
 
 let db;
 
