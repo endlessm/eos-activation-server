@@ -243,6 +243,7 @@ describe('Ping (integration)', () => {
                   expect(pingRecord).to.have.property('updatedAt');
                   expect(pingRecord).to.have.property('count');
                   expect(pingRecord).to.have.property('country');
+                  expect(pingRecord).to.have.property('release');
                   expect(pingRecord).to.have.property('config_id');
 
                   expect(pingRecord.country).to.equal('USA');
