@@ -58,6 +58,7 @@ const ping = (router, logger) => {
       pingRecord.config_id = config_id;
       pingRecord.country = record.country;
       pingRecord.count = record.count;
+      pingRecord.release = record.release;
 
       if (record.metrics_enabled !== undefined) {
         pingRecord.metrics_enabled = record.metrics_enabled;
