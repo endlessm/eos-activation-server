@@ -7,7 +7,7 @@
         {
             "type": "amazon-ebs",
             "region": "us-west-2",
-            "source_ami": "ami-b9ff39d9",
+            "source_ami": "ami-0a00ce72",
             "instance_type": "m4.large",
             "ssh_username": "ubuntu",
             "ami_name": "eos-activation-server_{{ isotime \"2006-01-02_1504\" }}",
