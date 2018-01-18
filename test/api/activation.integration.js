@@ -341,7 +341,7 @@ describe('Activation (integration)', () => {
           });
       });
 
-      it('does not fail if there\'s no serial', (done) => {
+      it("does not fail if there's no serial", (done) => {
         delete goodParams.serial;
         expect(goodParams).to.not.have.property('serial');
 

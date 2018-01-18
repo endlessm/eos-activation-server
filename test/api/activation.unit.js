@@ -208,7 +208,7 @@ describe('Activation (unit)', () => {
         });
       });
 
-      it('aren\'t invoked when data is bad', (done) => {
+      it("aren't invoked when data is bad", (done) => {
         delete goodParams.image;
         let hook = (record) => {
           done(new Error('Should not have gotten here'));
