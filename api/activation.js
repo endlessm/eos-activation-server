@@ -23,7 +23,10 @@ const activation = (router, logger) => {
       'serial':  { 'type': 'string' },
       'release': { 'type': 'string' },
       'live':    { 'type': 'boolean' },
-      'dualboot':{ 'type': 'boolean' }
+      'dualboot':{ 'type': 'boolean' },
+      'mac_hash':{ 'type': 'integer',
+                   'minimum': 0,
+                   'maximum': 2 ** 32 - 1 },
     },
     'required': ['image',
                  'vendor',
