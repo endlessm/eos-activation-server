@@ -262,7 +262,7 @@ describe('Activation (integration)', () => {
            });
       });
 
-      xit('does not create duplicates of same serial', (done) => {
+      xit('does not accept duplicate submissions of same serial', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
@@ -299,7 +299,7 @@ describe('Activation (integration)', () => {
           });
       });
 
-      it('handles duplicates', (done) => {
+      it('handles duplicate submissions without creating duplicate records', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
