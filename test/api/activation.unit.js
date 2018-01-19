@@ -152,6 +152,41 @@ describe('Activation (unit)', () => {
         });
       });
 
+      it('should fail if mac_hash is string', (done) => {
+        goodParams.mac_hash = 'sasquatch';
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
+        });
+      });
+
+      it('should fail if mac_hash is float', (done) => {
+        goodParams.mac_hash = 3.14159;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
+        });
+      });
+
+      it('should fail if mac_hash is negative', (done) => {
+        goodParams.mac_hash = -1;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
+        });
+      });
+
+      it('should fail if mac_hash is too large', (done) => {
+        goodParams.mac_hash = 2 ** 32;
+
+        testHandler(goodParams, undefined, done, (response) => {
+          expect(response.body.success).to.be.eql(false);
+          expect(response.status).to.be.equal(400);
+        });
+      });
     });
 
     describe('hooks', () => {
@@ -173,7 +208,7 @@ describe('Activation (unit)', () => {
         });
       });
 
-      it('aren\'t invoked when data is bad', (done) => {
+      it("aren't invoked when data is bad", (done) => {
         delete goodParams.image;
         let hook = (record) => {
           done(new Error('Should not have gotten here'));

@@ -174,6 +174,7 @@ describe('Activation (integration)', () => {
       let nature = Math.random();
       let live = nature < 0.33;
       let dualboot = nature > 0.67;
+      let mac_hash = Math.floor(Math.random() * (2 ** 32));
 
       beforeEach((done) => {
         goodParams = { image: image,
@@ -182,7 +183,8 @@ describe('Activation (integration)', () => {
                        release: release,
                        serial: serial,
                        live: live,
-                       dualboot: dualboot };
+                       dualboot: dualboot,
+                       mac_hash: mac_hash };
 
         db.Activation.sync({ force : true }).then(() => {
           done();
@@ -220,6 +222,7 @@ describe('Activation (integration)', () => {
                   expect(activationRecord).to.have.property('longitude');
                   expect(activationRecord).to.have.property('live');
                   expect(activationRecord).to.have.property('dualboot');
+                  expect(activationRecord).to.have.property('mac_hash');
 
                   expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
                   expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
@@ -230,6 +233,7 @@ describe('Activation (integration)', () => {
                   expect(activationRecord.longitude).to.be.within(-123, -121);
                   expect(activationRecord.live).to.eql(live);
                   expect(activationRecord.dualboot).to.eql(dualboot);
+                  expect(activationRecord.mac_hash).to.eql(mac_hash);
                 } catch(e) {
                   done()
                   logger.error(e);
@@ -262,7 +266,7 @@ describe('Activation (integration)', () => {
            });
       });
 
-      xit('does not create duplicates of same serial', (done) => {
+      xit('does not accept duplicate submissions of same serial', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
@@ -299,7 +303,7 @@ describe('Activation (integration)', () => {
           });
       });
 
-      it('handles duplicates', (done) => {
+      it('handles duplicate submissions without creating duplicate records', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
@@ -321,6 +325,7 @@ describe('Activation (integration)', () => {
                .then((result) => {
                  expect(result.count).to.equal(1);
                  expect(result.rows[0].serial).to.eql(serial);
+                 expect(result.rows[0].mac_hash).to.eql(mac_hash);
 
                  done();
                })
@@ -336,7 +341,7 @@ describe('Activation (integration)', () => {
           });
       });
 
-      it('does not fail if there\'s no serial', (done) => {
+      it("does not fail if there's no serial", (done) => {
         delete goodParams.serial;
         expect(goodParams).to.not.have.property('serial');
 
@@ -359,6 +364,35 @@ describe('Activation (integration)', () => {
                 }
 
                 expect(res.body).to.not.have.property('serial');
+
+                done();
+              });
+           });
+      });
+
+      it("does not fail if there's no mac_hash", (done) => {
+        delete goodParams.mac_hash;
+        expect(goodParams).to.not.have.property('mac_hash');
+
+        request(HOST)
+          .put('/v1/activate')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Activation.findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+
+                for (let prop in goodParams) {
+                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
+                }
+
+                expect(res.body).to.not.have.property('mac_hash');
 
                 done();
               });

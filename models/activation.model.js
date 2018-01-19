@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     serial: DataTypes.STRING,
     live: DataTypes.BOOLEAN,
     dualboot: DataTypes.BOOLEAN,
+    mac_hash: DataTypes.INTEGER,
     country: DataTypes.STRING,
     region: DataTypes.STRING,
     city: DataTypes.STRING,
