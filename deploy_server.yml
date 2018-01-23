@@ -81,7 +81,7 @@
         database_volume="{{ item.id }}"
         aws_zone="{{ item.zone }}"
       when: 'not item.attachment_set.device.endswith("sda1")'
-      with_items: "{{ volume_listing.volumes | to_json }}"
+      with_items: "{{ volume_listing.volumes }}"
 
     - debug: msg="Database Volume '{{ database_volume }}'"
     - debug: msg="Database Volume Zone '{{ aws_zone }}'"
