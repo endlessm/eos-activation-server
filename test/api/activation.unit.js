@@ -180,7 +180,7 @@ describe('Activation (unit)', () => {
       });
 
       it('should fail if mac_hash is too large', (done) => {
-        goodParams.mac_hash = 2 ** 32;
+        goodParams.mac_hash = Math.pow(2, 32);
 
         testHandler(goodParams, undefined, done, (response) => {
           expect(response.body.success).to.be.eql(false);

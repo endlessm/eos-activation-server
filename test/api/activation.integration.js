@@ -174,7 +174,7 @@ describe('Activation (integration)', () => {
       let nature = Math.random();
       let live = nature < 0.33;
       let dualboot = nature > 0.67;
-      let mac_hash = Math.floor(Math.random() * (2 ** 32));
+      let mac_hash = Math.floor(Math.random() * Math.pow(2, 32));
 
       beforeEach((done) => {
         goodParams = { image: image,
