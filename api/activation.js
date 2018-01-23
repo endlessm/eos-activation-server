@@ -26,7 +26,7 @@ const activation = (router, logger) => {
       'dualboot':{ 'type': 'boolean' },
       'mac_hash':{ 'type': 'integer',
                    'minimum': 0,
-                   'maximum': 2 ** 32 - 1 },
+                   'maximum': Math.pow(2, 32) - 1 },
     },
     'required': ['image',
                  'vendor',
