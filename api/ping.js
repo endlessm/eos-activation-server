@@ -59,6 +59,7 @@ const ping = (router, logger) => {
       pingRecord.country = record.country;
       pingRecord.count = record.count;
       pingRecord.release = record.release;
+      pingRecord.dualboot = record.dualboot;
 
       if (record.metrics_enabled !== undefined) {
         pingRecord.metrics_enabled = record.metrics_enabled;

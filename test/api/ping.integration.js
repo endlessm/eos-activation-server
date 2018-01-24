@@ -172,12 +172,12 @@ describe('Ping (integration)', () => {
     });
 
     describe('data persistence', ()  => {
-      let image =   'image '   + Math.random();
-      let vendor =  'vendor '  + Math.random();
-      let product = 'product ' + Math.random();
-      let release = 'release ' + Math.random();
-      let count = Math.floor((Math.random() * 100000) + 1);
-      let dualboot = _.sample([undefined, false, true]);
+      const image =   'image '   + Math.random();
+      const vendor =  'vendor '  + Math.random();
+      const product = 'product ' + Math.random();
+      const release = 'release ' + Math.random();
+      const count = Math.floor((Math.random() * 100000) + 1);
+      const dualboot = _.sample([undefined, false, true]);
 
       beforeEach((done) => {
         configurationFields = ['image',
@@ -225,6 +225,7 @@ describe('Ping (integration)', () => {
                 expect(configuration).to.have.property('image');
                 expect(configuration).to.have.property('vendor');
                 expect(configuration).to.have.property('product');
+
                 for (let prop in configurationFields) {
                   expect(configuration[prop]).to.eql(goodParams[prop]);
                 }
@@ -245,6 +246,7 @@ describe('Ping (integration)', () => {
                   expect(pingRecord).to.have.property('country');
                   expect(pingRecord).to.have.property('release');
                   expect(pingRecord).to.have.property('config_id');
+                  expect(pingRecord).to.have.property('dualboot');
 
                   expect(pingRecord.country).to.equal('USA');
                   expect(pingRecord.count).to.equal(count);
