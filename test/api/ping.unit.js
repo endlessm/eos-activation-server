@@ -176,12 +176,12 @@ describe('Ping (unit)', () => {
         });
       });
 
-      it('should fail if count is not included', (done) => {
+      it('should not fail if count is not included', (done) => {
         delete goodParams.count;
 
         testHandler(goodParams, undefined, done, (response) => {
-          expect(response.body.success).to.be.eql(false);
-          expect(response.status).to.be.equal(400);
+          expect(response.body.success).to.be.eql(true);
+          expect(response.status).to.be.equal(200);
         });
       });
 

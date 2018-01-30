@@ -30,8 +30,7 @@ const ping = (router, logger) => {
     'required': ['image',
                  'vendor',
                  'product',
-                 'release',
-                 'count']
+                 'release']
   }
 
   const handleError = (res, err) => {
@@ -57,7 +56,7 @@ const ping = (router, logger) => {
 
       pingRecord.config_id = config_id;
       pingRecord.country = record.country;
-      pingRecord.count = record.count;
+      pingRecord.count = record.count || 0;
       pingRecord.release = record.release;
       pingRecord.dualboot = record.dualboot;
 
