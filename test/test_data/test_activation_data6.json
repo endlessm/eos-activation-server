@@ -1,0 +1,8 @@
+{
+  "vendor": "vendor",
+  "product": "Some Product",
+  "image": "eosoem-eos3.3-amd64-nexthw.180125-034410.sea",
+  "serial": "FFFFFFFFFFFFFFF",
+  "mac_hash": 222222222,
+  "release": "3.3.10"
+}
