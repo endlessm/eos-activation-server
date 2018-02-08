@@ -146,10 +146,6 @@ describe('Ping (integration)', () => {
       it('should fail if release name is not included', (done) => {
         parameterTest(done, 'release');
       });
-
-      it('should fail if count is not included', (done) => {
-        parameterTest(done, 'count');
-      });
     });
 
     describe('geolocation', ()  => {
@@ -191,7 +187,6 @@ describe('Ping (integration)', () => {
                        vendor: vendor,
                        product: product,
                        release: release,
-                       count: count,
                        dualboot: dualboot };
 
         db.Ping().sync({ force : true }).then(() => {
@@ -249,7 +244,7 @@ describe('Ping (integration)', () => {
                   expect(pingRecord).to.have.property('dualboot');
 
                   expect(pingRecord.country).to.equal('USA');
-                  expect(pingRecord.count).to.equal(count);
+                  expect(pingRecord.count).to.equal(0);
                   expect(pingRecord.config_id).to.eql(configuration._id);
                   expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
                   expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
@@ -313,8 +308,8 @@ describe('Ping (integration)', () => {
              db.Ping().findAndCountAll()
                .then((result) => {
                  expect(result.count).to.equal(2);
-                 expect(result.rows[0].count).to.eql(count);
-                 expect(result.rows[1].count).to.eql(count);
+                 expect(result.rows[0].release).to.eql(release);
+                 expect(result.rows[1].release).to.eql(release);
 
                  done();
                })
@@ -368,6 +363,32 @@ describe('Ping (integration)', () => {
                   done(err);
                 });
               }).catch((err) => {
+                done(err);
+              });
+           });
+      });
+
+      it('stores the count data', (done) => {
+        goodParams['count'] = 123;
+
+        request(HOST)
+          .put('/v1/ping')
+          .set('X-Forwarded-For', '204.28.125.53')
+          .send(goodParams)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end((err, res) => {
+              errorHandler(err, res);
+
+              expect(res.body.success).to.equal(true);
+
+              db.Ping().findAndCountAll().then((result) => {
+                expect(result.count).to.equal(1);
+                expect(result.rows[0].count).to.eql(123);
+
+                done();
+              })
+              .catch((err) => {
                 done(err);
               });
            });

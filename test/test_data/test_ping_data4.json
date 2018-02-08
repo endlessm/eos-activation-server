@@ -1,0 +1,7 @@
+{
+  "image": "eos-eos3.3-amd64-amd64.foo-bar.base",
+  "product": "product",
+  "release": "3.1.10",
+  "vendor": "vendor",
+  "metrics_environment": "dev"
+}
