@@ -53,6 +53,15 @@ else
   echo "Access: OK"
 fi
 
+admin_dir=${CURRENT_DIR}/tools/eos-administration
+if [ -d ${admin_dir} ]; then
+  echo Updating eos-administration
+  git -C ${admin_dir} pull
+else
+  echo Cloning eos-administration
+  git clone git@github.com:endlessm/eos-administration.git ${admin_dir}
+fi
+
 echo Fetching latest Packer
 binary_package=packer_${LATEST_VERSION}_linux_${PACKER_ARCH}.zip
 if [ ! -f ${binary_package} ]; then
