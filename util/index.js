@@ -7,7 +7,12 @@ const loggingLevel = process.env.NODE_ENV == 'test' ? 'debug'
                                                     : 'info';
 const logger = new (winston.Logger) ({
   transports: [
-    new (winston.transports.Console)({ level: loggingLevel })
+    new (winston.transports.Console)({
+      level: loggingLevel,
+      // Note that in winston >= 3.0 this is handled by setting a custom
+      // log format
+      timestamp: true,
+    })
   ]
 });
 
