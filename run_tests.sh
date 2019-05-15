@@ -66,8 +66,9 @@ pushd $CURRENT_DIR > /dev/null
 
     ./node_modules/.bin/mocha --recursive \
                               --check-leaks \
+			      --exit \
                               --reporter mocha-jenkins-reporter || true
   else
-    ./node_modules/.bin/mocha --recursive --check-leaks
+    ./node_modules/.bin/mocha --recursive --check-leaks --exit
   fi
 popd >/dev/null
