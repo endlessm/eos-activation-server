@@ -224,17 +224,17 @@ const connectToMongo = (callback) => {
   }
 
   logger.info("Trying to connect: " + connectionUrl);
-  mongoClient.connect(connectionUrl, function(err, mongoDatabase) {
+  mongoClient.connect(connectionUrl, function(err, client) {
     // Async could get us connected in the meantime so check again
     if (db == undefined) {
       assert.equal(null, err);
       logger.info("Connected to server: " + connectionUrl);
 
-      db = mongoDatabase;
+      db = client.db();
       associateModels(db);
     } else {
       logger.silly("DB already opened, closing this request");
-      mongoDatabase.close()
+      client.close()
     }
 
     callback(db);
