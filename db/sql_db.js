@@ -54,7 +54,7 @@ sequelize.authenticate()
             });
           })
           .catch((err) => {
-            logger.error('Unable to connect to the database:', err);
+            logger.error('Unable to connect to the database: ' + err);
             throw err;
           });
 

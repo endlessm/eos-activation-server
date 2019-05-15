@@ -5,13 +5,17 @@ const winston = require('winston');
 
 const loggingLevel = process.env.NODE_ENV == 'test' ? 'debug'
                                                     : 'info';
-const logger = new (winston.Logger) ({
+const logger = winston.createLogger({
   transports: [
-    new (winston.transports.Console)({
+    new winston.transports.Console({
       level: loggingLevel,
-      // Note that in winston >= 3.0 this is handled by setting a custom
-      // log format
-      timestamp: true,
+      format: winston.format.combine(
+        winston.format.splat(),
+        winston.format.timestamp({
+          format: 'YYYY-MM-DDTHH:mm:ss.SSSZ'
+        }),
+        winston.format.printf(info => `${info.timestamp} - ${info.level}: ${info.message}`),
+      ),
     })
   ]
 });

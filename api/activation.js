@@ -35,11 +35,12 @@ const activation = (router, logger) => {
   }
 
   const insertActivationRecord = (res, record) => {
-    logger.info('Activation attempt:', record);
+    let recordSerialized = JSON.stringify(record);
+    logger.info('Activation attempt: ' + recordSerialized);
 
     db.Activation.upsert(record)
                  .then((changed) => {
-      logger.info('Activation saved:', record);
+      logger.info('Activation saved: ' + recordSerialized);
 
       hooksHandler(record);
 
@@ -84,7 +85,7 @@ const activation = (router, logger) => {
 
         const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
-          logger.info('Geo:', geoLookup);
+          logger.info('Geo: ' + geoLookup);
 
           // Store 3-letter code vs 2-letter one since vendor wants it that way
           activation.country = countries.alpha2ToAlpha3(geoLookup.country);
