@@ -19,7 +19,7 @@
   "homepage": "https://github.com/endlessm/eos-activation-server",
   "dependencies": {
     "body-parser": "^1.17.1",
-    "bull": "^2.2.6",
+    "bull": "^3.9.1",
     "express": "^4.15.2",
     "geoip-lite": "^1.2.0",
     "i18n-iso-countries": "^4.0.0",
