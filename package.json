@@ -22,21 +22,21 @@
     "bull": "^2.2.6",
     "express": "^4.15.2",
     "geoip-lite": "^1.2.0",
-    "i18n-iso-countries": "^1.11.0",
+    "i18n-iso-countries": "^4.0.0",
     "jsonschema": "^1.1.0",
     "mongodb": "^2.2.25",
-    "pm2": "^2.9.1",
+    "pm2": "^3.5.0",
     "soap": "^0.27.1",
     "underscore": "^1.8.3",
     "uuid": "^3.0.1",
     "winston": "^2.3.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
+    "chai": "^4.2.0",
     "chai-datetime": "^1.4.1",
     "mocha": "^6.1.4",
     "mocha-jenkins-reporter": "^0.4.1",
-    "sinon": "^2.1.0",
-    "supertest": "^3.0.0"
+    "sinon": "^7.3.2",
+    "supertest": "^4.0.2"
   }
 }
