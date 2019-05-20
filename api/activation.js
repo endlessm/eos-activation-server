@@ -16,21 +16,39 @@ const activation = (router, logger) => {
   const activation_schema = {
     'type': 'object',
     'properties': {
-      'image':   { 'type': 'string' },
-      'vendor':  { 'type': 'string' },
-      'product': { 'type': 'string' },
-      'serial':  { 'type': 'string' },
-      'release': { 'type': 'string' },
-      'live':    { 'type': 'boolean' },
-      'dualboot':{ 'type': 'boolean' },
-      'mac_hash':{ 'type': 'integer',
-                   'minimum': 0,
-                   'maximum': Math.pow(2, 32) - 1 },
+      'image': {
+        'type': 'string',
+      },
+      'vendor': {
+        'type': 'string',
+      },
+      'product': {
+        'type': 'string',
+      },
+      'release': {
+        'type': 'string',
+      },
+      'dualboot': {
+        'type': 'boolean',
+      },
+      'serial': {
+        'type': 'string',
+      },
+      'live': {
+        'type': 'boolean',
+      },
+      'mac_hash': {
+        'type': 'integer',
+        'minimum': 0,
+        'maximum': Math.pow(2, 32) - 1,
+      },
     },
-    'required': ['image',
-                 'vendor',
-                 'product',
-                 'release']
+    'required': [
+      'image',
+      'vendor',
+      'product',
+      'release',
+    ]
   }
 
   const insertActivationRecord = (res, record) => {

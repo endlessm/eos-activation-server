@@ -17,20 +17,38 @@ const ping = (router, logger) => {
   const ping_schema = {
     'type': 'object',
     'properties': {
-      'image':               { 'type': 'string' },
-      'vendor':              { 'type': 'string' },
-      'product':             { 'type': 'string' },
-      'release':             { 'type': 'string' },
-      'count':               { 'type': 'integer',
-                               'minimum': 0 },
-      'dualboot':            { 'type': 'boolean' },
-      'metrics_enabled':     { 'type': 'boolean' },
-      'metrics_environment': { 'type': 'string' },
+      'image': {
+        'type': 'string',
+      },
+      'vendor': {
+        'type': 'string',
+      },
+      'product': {
+        'type': 'string',
+      },
+      'release': {
+        'type': 'string',
+      },
+      'dualboot': {
+        'type': 'boolean',
+      },
+      'count': {
+        'type': 'integer',
+        'minimum': 0,
+      },
+      'metrics_enabled': {
+        'type': 'boolean',
+      },
+      'metrics_environment': {
+        'type': 'string',
+      },
     },
-    'required': ['image',
-                 'vendor',
-                 'product',
-                 'release']
+    'required': [
+      'image',
+      'vendor',
+      'product',
+      'release',
+    ]
   }
 
   const handleError = (res, err) => {
