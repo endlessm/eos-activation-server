@@ -49,16 +49,6 @@ const ping = (router, logger) => {
     ]
   }
 
-  const handleError = (res, err) => {
-    logger.error(err);
-
-    res.status(500)
-       .json({ error: err.toString(),
-               success: false });
-
-    throw err;
-  }
-
   const insertPingRecord = (res, version, record) => {
     let recordSerialized = JSON.stringify(record);
     logger.info('Ping attempt: ' + recordSerialized);
@@ -70,7 +60,13 @@ const ping = (router, logger) => {
       res.status(200)
          .json({ success: true });
     }).catch((err) => {
-        handleError(res, err);
+      logger.error(err);
+
+      res.status(500)
+         .json({ error: err.toString(),
+                 success: false });
+
+      throw err;
     });
   }
 
