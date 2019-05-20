@@ -6,10 +6,8 @@ const express = require('express');
 const geoip = require('geoip-lite');
 const Validator = require('jsonschema').Validator;
 
-const pingConfigurationMapper = require('../util/ping_configuration_mapper');
-
 // Overridable on import of this module
-let db;
+let redis;
 
 const ping = (router, logger) => {
   const validator = new Validator();
@@ -61,41 +59,16 @@ const ping = (router, logger) => {
     throw err;
   }
 
-  const insertPingRecord = (res, record) => {
+  const insertPingRecord = (res, version, record) => {
     let recordSerialized = JSON.stringify(record);
     logger.info('Ping attempt: ' + recordSerialized);
 
-    // XXX: Passing in DB isn't the best but we don't want to init
-    //      it each time out config manager is invoked and doing
-    //      this in other async ways would be pretty tricky.
-    pingConfigurationMapper.getIdFor(db, record).then((config_id) => {
-      logger.debug('Configuration id: ' + config_id.toString());
-      var pingRecord = {};
-      // TODO: Increment total ping count
+    redis.lpush(`ping-${version}`, recordSerialized)
+                 .then((changed) => {
+      logger.info('Ping saved: ' + recordSerialized);
 
-      pingRecord.config_id = config_id;
-      pingRecord.country = record.country;
-      pingRecord.count = record.count || 0;
-      pingRecord.release = record.release;
-      pingRecord.dualboot = record.dualboot;
-
-      if (record.metrics_enabled !== undefined) {
-        pingRecord.metrics_enabled = record.metrics_enabled;
-      }
-      if (record.metrics_environment !== undefined) {
-        pingRecord.metrics_environment = record.metrics_environment;
-      }
-
-      // XXX: NoSQL-only method for now
-      db.Ping().create(pingRecord)
-               .then((result) => {
-        logger.info('Ping saved: ' + JSON.stringify(pingRecord));
-
-        res.status(200)
-           .json({ success: true });
-      }).catch((err) => {
-        handleError(res, err);
-      });
+      res.status(200)
+         .json({ success: true });
     }).catch((err) => {
         handleError(res, err);
     });
@@ -136,7 +109,11 @@ const ping = (router, logger) => {
           ping.country = countries.alpha2ToAlpha3(geoLookup.country);
         }
 
-        insertPingRecord(res, ping);
+        ping.createdAt = new Date().toISOString();
+        ping.updatedAt = new Date().toISOString();
+
+        // The 1 represents the API version ('/v1/' part of the URL)
+        insertPingRecord(res, 1, ping);
       },
 
       'default': () => {
@@ -149,8 +126,8 @@ const ping = (router, logger) => {
   return router;
 }
 
-exports = module.exports = (router, database, logger) => {
-  db = database;
+exports = module.exports = (router, redisClient, logger) => {
+  redis = redisClient;
 
   return ping(router, logger);
 };
