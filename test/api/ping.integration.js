@@ -16,7 +16,6 @@ const request = require('supertest');
 let db;
 
 const logger = require('../../util').logger;
-const _ = require('underscore');
 
 describe('Ping (integration)', () => {
   before((done) => {
@@ -173,7 +172,7 @@ describe('Ping (integration)', () => {
       const product = 'product ' + Math.random();
       const release = 'release ' + Math.random();
       const count = Math.floor((Math.random() * 100000) + 1);
-      const dualboot = _.sample([undefined, false, true]);
+      const dualboot = [undefined, false, true][Math.floor(Math.random() * Math.floor(3))];
 
       beforeEach((done) => {
         configurationFields = ['image',
