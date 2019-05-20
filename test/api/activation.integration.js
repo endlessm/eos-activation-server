@@ -260,43 +260,6 @@ describe('Activation (integration)', () => {
            });
       });
 
-      xit('does not accept duplicate submissions of same serial', (done) => {
-        request(HOST)
-          .put('/v1/activate')
-          .set('X-Forwarded-For', '204.28.125.53')
-          .send(goodParams)
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .then((res) => {
-             expect(res.body.success).to.equal(true);
-
-             return request(HOST)
-               .put('/v1/activate')
-               .set('X-Forwarded-For', '204.28.125.53')
-               .send(goodParams)
-               .expect('Content-Type', /json/)
-               .expect(409);
-          })
-          .then((res) => {
-             db.Activation.findAndCountAll()
-               .then((result) => {
-                 expect(result.count).to.equal(1);
-                 expect(result.rows[0].serial).to.eql(serial);
-
-                 done();
-               })
-               .catch((err) => {
-                 errorHandler(err);
-
-                 done(err);
-               });
-          })
-          .catch((err, res) => {
-             errorHandler(err, res);
-             done(err);
-          });
-      });
-
       it('handles duplicate submissions without creating duplicate records', (done) => {
         request(HOST)
           .put('/v1/activate')
