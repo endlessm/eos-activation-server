@@ -4,12 +4,12 @@
 const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
+const Validator = require('jsonschema').Validator;
+
 const pingConfigurationMapper = require('../util/ping_configuration_mapper');
 
 // Overridable on import of this module
 let db;
-
-const Validator = require('jsonschema').Validator;
 
 const ping = (router, logger) => {
   const validator = new Validator();
