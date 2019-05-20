@@ -220,9 +220,6 @@ describe('Activation (integration)', () => {
                   expect(activationRecord).to.have.property('city');
                   expect(activationRecord).to.have.property('latitude');
                   expect(activationRecord).to.have.property('longitude');
-                  expect(activationRecord).to.have.property('live');
-                  expect(activationRecord).to.have.property('dualboot');
-                  expect(activationRecord).to.have.property('mac_hash');
 
                   expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
                   expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
@@ -231,9 +228,6 @@ describe('Activation (integration)', () => {
                   expect(activationRecord.city).to.equal('San Francisco');
                   expect(activationRecord.latitude).to.be.within(36, 38);
                   expect(activationRecord.longitude).to.be.within(-123, -121);
-                  expect(activationRecord.live).to.eql(live);
-                  expect(activationRecord.dualboot).to.eql(dualboot);
-                  expect(activationRecord.mac_hash).to.eql(mac_hash);
                 } catch(e) {
                   done()
                   logger.error(e);
