@@ -33,11 +33,7 @@ describe('Activation (unit)', () => {
     helpers.invokeHandler(testClass, db, params, options).then((response) => {
       testCallback(response);
 
-      if (options === undefined ||
-          options['skip_done'] === undefined ||
-          options.skip_done === false) {
-        done();
-      }
+      done();
     })
     .catch(done);
   };
@@ -198,11 +194,9 @@ describe('Activation (unit)', () => {
             expect(record).to.have.property(prop);
             expect(record[prop]).to.be.eql(goodParams[prop]);
           }
-
-          done();
         }
 
-        testHandler(goodParams, { hook: hook , skip_done: true }, (response) => {
+        testHandler(goodParams, { hook: hook }, done, (response) => {
           expect(response.body.success).to.be.eql(true);
           expect(response.status).to.be.equal(200);
         });
