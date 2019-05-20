@@ -110,7 +110,6 @@ const ping = (router, logger) => {
         const validationResult = validator.validate(req.body, ping_schema)
         if (validationResult.errors.length > 0) {
           logger.warn("Request failed schema validation!");
-          logger.warn("Data: " + req.data);
 
           for (let errorMesage of validationResult.errors) {
             logger.debug(" - " + errorMesage);
