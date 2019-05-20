@@ -11,17 +11,17 @@ chai.use(require('chai-datetime'));
 const expect = require('chai').expect;
 const request = require('supertest');
 
-const dbDriver = require('../../db');
+const redisBackend = require('../../util/redis').getRedis;
 
 const logger = require('../../util').logger;
 
-let db;
+let redis;
 
 describe('Activation (integration)', () => {
   before((done) => {
-    dbDriver((database) => {
-      db = database;
-      done()
+    redisBackend((redisClient) => {
+      redis = redisClient;
+      done();
     });
   });
 
@@ -185,7 +185,7 @@ describe('Activation (integration)', () => {
                        dualboot: dualboot,
                        mac_hash: mac_hash };
 
-        db.Activation.sync({ force : true }).then(() => {
+        redis.del('activation-1').then(() => {
           done();
         });
       });
@@ -203,37 +203,33 @@ describe('Activation (integration)', () => {
               expect(res.body.success).to.equal(true);
 
               logger.error("Finding matching records...");
-              db.Activation.findAndCountAll().then((result) => {
-                try {
-                  expect(result.count).to.equal(1);
+              redis.lrange('activation-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
 
-                  const activationRecord = result.rows[0];
-                  for (let prop in goodParams) {
-                    expect(activationRecord[prop]).to.eql(goodParams[prop]);
-                  }
-
-                  expect(activationRecord).to.have.property('createdAt');
-                  expect(activationRecord).to.have.property('updatedAt');
-                  expect(activationRecord).to.have.property('country');
-                  expect(activationRecord).to.have.property('region');
-                  expect(activationRecord).to.have.property('city');
-                  expect(activationRecord).to.have.property('latitude');
-                  expect(activationRecord).to.have.property('longitude');
-
-                  expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
-                  expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
-                  expect(activationRecord.country).to.equal('USA');
-                  expect(activationRecord.region).to.equal('CA');
-                  expect(activationRecord.city).to.equal('San Francisco');
-                  expect(activationRecord.latitude).to.be.within(36, 38);
-                  expect(activationRecord.longitude).to.be.within(-123, -121);
-                } catch(e) {
-                  done()
-                  logger.error(e);
-                  throw e;
+                const record = JSON.parse(result[0]);
+                for (let prop in goodParams) {
+                  expect(record[prop]).to.eql(goodParams[prop]);
                 }
 
+                expect(record).to.have.property('createdAt');
+                expect(record).to.have.property('updatedAt');
+                expect(record).to.have.property('country');
+                expect(record).to.have.property('region');
+                expect(record).to.have.property('city');
+                expect(record).to.have.property('latitude');
+                expect(record).to.have.property('longitude');
+
+                expect(isExpectedDate(new Date(record.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(record.updatedAt))).to.equal(true);
+                expect(record.country).to.equal('USA');
+                expect(record.region).to.equal('CA');
+                expect(record.city).to.equal('San Francisco');
+                expect(record.latitude).to.be.within(36, 38);
+                expect(record.longitude).to.be.within(-123, -121);
+
                 done();
+              }).catch((err) => {
+                done(err);
               });
            });
       });
@@ -250,16 +246,21 @@ describe('Activation (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Activation.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
-                expect(result.rows[0].country).to.eql('USA');
+              redis.lrange('activation-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+
+                const record = JSON.parse(result[0]);
+                expect(record.country).to.eql('USA');
 
                 done();
+              })
+              .catch((err) => {
+                done(err);
               });
            });
       });
 
-      it('handles duplicate submissions without creating duplicate records', (done) => {
+      it('handles duplicate submissions', (done) => {
         request(HOST)
           .put('/v1/activate')
           .set('X-Forwarded-For', '204.28.125.53')
@@ -277,11 +278,15 @@ describe('Activation (integration)', () => {
                .expect(200);
           })
           .then((res) => {
-             db.Activation.findAndCountAll()
+             redis.lrange('activation-1', 0, -1)
                .then((result) => {
-                 expect(result.count).to.equal(1);
-                 expect(result.rows[0].serial).to.eql(serial);
-                 expect(result.rows[0].mac_hash).to.eql(mac_hash);
+                 expect(result.length).to.equal(2);
+
+                 for (let i = 0; i < result.length; i++) {
+                   const record = JSON.parse(result[i]);
+                   expect(record.serial).to.eql(serial);
+                   expect(record.mac_hash).to.eql(mac_hash);
+                 }
 
                  done();
                })
@@ -312,11 +317,12 @@ describe('Activation (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Activation.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
+              redis.lrange('activation-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+                const record = JSON.parse(result[0]);
 
                 for (let prop in goodParams) {
-                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
+                  expect(record[prop]).to.eql(goodParams[prop]);
                 }
 
                 expect(res.body).to.not.have.property('serial');
@@ -341,11 +347,12 @@ describe('Activation (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Activation.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
+              redis.lrange('activation-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+                const record = JSON.parse(result[0]);
 
                 for (let prop in goodParams) {
-                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
+                  expect(record[prop]).to.eql(goodParams[prop]);
                 }
 
                 expect(res.body).to.not.have.property('mac_hash');
@@ -367,21 +374,22 @@ describe('Activation (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Activation.findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
+              redis.lrange('activation-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+                const record = JSON.parse(result[0]);
 
                 for (let prop in goodParams) {
-                  expect(result.rows[0][prop]).to.eql(goodParams[prop]);
+                  expect(record[prop]).to.eql(goodParams[prop]);
                 }
 
                 var timeAfterRequest = new Date();
                 timeAfterRequest.setMinutes(timeAfterRequest.getMinutes() + 1);
 
-                expect(result.rows[0]).to.have.property('createdAt');
-                expect(result.rows[0]).to.have.property('updatedAt');
+                expect(record).to.have.property('createdAt');
+                expect(record).to.have.property('updatedAt');
 
-                expect(isExpectedDate(new Date(result.rows[0].createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(result.rows[0].updatedAt))).to.equal(true);
+                expect(isExpectedDate(new Date(record.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(record.updatedAt))).to.equal(true);
 
                 done();
               });

@@ -7,7 +7,7 @@ const geoip = require('geoip-lite');
 const Validator = require('jsonschema').Validator;
 
 // Overridable on import of this module
-let db;
+let redis;
 let hooksHandler;
 
 const activation = (router, logger) => {
@@ -51,11 +51,11 @@ const activation = (router, logger) => {
     ]
   }
 
-  const insertActivationRecord = (res, record) => {
+  const insertActivationRecord = (res, version, record) => {
     let recordSerialized = JSON.stringify(record);
     logger.info('Activation attempt: ' + recordSerialized);
 
-    db.Activation.upsert(record)
+    redis.lpush(`activation-${version}`, recordSerialized)
                  .then((changed) => {
       logger.info('Activation saved: ' + recordSerialized);
 
@@ -83,6 +83,7 @@ const activation = (router, logger) => {
         const validationResult = validator.validate(req.body, activation_schema)
         if (validationResult.errors.length > 0) {
           logger.warn("Request failed schema validation!");
+
           for (let errorMesage of validationResult.errors) {
             logger.debug(" - " + errorMesage);
           }
@@ -115,7 +116,11 @@ const activation = (router, logger) => {
           }
         }
 
-        insertActivationRecord(res, activation);
+        activation.createdAt = new Date().toISOString();
+        activation.updatedAt = new Date().toISOString();
+
+        // The 1 represents the API version ('/v1/' part of the URL)
+        insertActivationRecord(res, 1, activation);
       },
 
       'default': () => {
@@ -129,7 +134,7 @@ const activation = (router, logger) => {
 }
 
 // Allows injection of hook handler
-exports = module.exports = (router, database, logger, handler) => {
+exports = module.exports = (router, redisClient, logger, handler) => {
   if (handler) {
     logger.warn('Activation hook handler overriden!');
     hooksHandler = handler;
@@ -138,7 +143,7 @@ exports = module.exports = (router, database, logger, handler) => {
     hooksHandler = require('../activation_hooks');
   }
 
-  db = database;
+  redis = redisClient;
 
   return activation(router, logger);
-}
+};
