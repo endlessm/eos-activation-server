@@ -35,7 +35,6 @@ describe('Activation (integration)', () => {
       logger.error(err);
 
       if (res) {
-        // logger.error(res);
         logger.error(res.status);
         logger.error(res.headers);
         logger.error(res.body);
