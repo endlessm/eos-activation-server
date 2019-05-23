@@ -44,13 +44,14 @@ const ping = (router, logger) => {
   }
 
   const insertPingRecord = (res, record) => {
-    logger.info('Ping attempt:', record);
+    let recordSerialized = JSON.stringify(record);
+    logger.info('Ping attempt: ' + recordSerialized);
 
     // XXX: Passing in DB isn't the best but we don't want to init
     //      it each time out config manager is invoked and doing
     //      this in other async ways would be pretty tricky.
     pingConfigurationMapper.getIdFor(db, record).then((config_id) => {
-      logger.debug('Configuration id:', config_id.toString());
+      logger.debug('Configuration id: ' + config_id.toString());
       var pingRecord = {};
       // TODO: Increment total ping count
 
@@ -70,7 +71,7 @@ const ping = (router, logger) => {
       // XXX: NoSQL-only method for now
       db.Ping().create(pingRecord)
                .then((result) => {
-        logger.info('Ping saved:', JSON.stringify(pingRecord));
+        logger.info('Ping saved: ' + JSON.stringify(pingRecord));
 
         res.status(200)
            .json({ success: true });
@@ -91,7 +92,7 @@ const ping = (router, logger) => {
         const validationResult = validator.validate(req.body, ping_schema)
         if (validationResult.errors.length > 0) {
           logger.warn("Request failed schema validation!");
-          logger.warn("Data:", req.data);
+          logger.warn("Data: " + req.data);
 
           for (let errorMesage of validationResult.errors) {
             logger.debug(" - " + errorMesage);
@@ -112,7 +113,7 @@ const ping = (router, logger) => {
 
         const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
-          logger.info('Geo:', geoLookup);
+          logger.info('Geo: ' + geoLookup);
 
           // Store 3-letter code vs 2-letter one
           ping.country = countries.alpha2ToAlpha3(geoLookup.country);

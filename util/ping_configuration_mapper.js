@@ -22,7 +22,7 @@ const getIdFor = (db, record) => {
     delete configuration['dualboot'];
   }
 
-  logger.silly("Trying to find config id for", configuration);
+  logger.silly("Trying to find config id for " + JSON.stringify(configuration));
 
   return db.Configuration.upsert(configuration);
 }

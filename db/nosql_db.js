@@ -51,7 +51,7 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
     // Intentionally here so that we keep evaluating it on func eval
     const tableName = getTableName(rawTableName);
 
-    logger.debug("Generating API for DB:", tableName);
+    logger.debug("Generating API for DB: " + tableName);
     const baseCollection = db.collection(tableName);
     var collection = {};
 
@@ -76,10 +76,10 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
                                          w: 'majority',
                                          'new': true },
                                        (err, result) => {
-            logger.debug('Upserted into ' + datasetName + ':',
+            logger.debug('Upserted into ' + datasetName + ': ' +
                          JSON.stringify(data));
 
-            logger.silly('Upsert into ' + datasetName + ' with ObjectID:',
+            logger.silly('Upsert into ' + datasetName + ' with ObjectID: ' +
                          result.value._id.toString());
 
             if (err) {
@@ -112,7 +112,7 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
         if (options.force && options.force != true) {
           fulfill();
         } else {
-          logger.warn("Clear of DB requested:", datasetName);
+          logger.warn("Clear of DB requested: " + datasetName);
           baseCollection.deleteMany({}, (err, result) => {
             if (err) {
               reject(err);
@@ -126,7 +126,7 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
 
     collection.findAndCountAll = (options) => {
       return new Promise((fulfill, reject) => {
-        logger.debug("Finding all items in", datasetName);
+        logger.debug("Finding all items in " + datasetName);
 
         const cursor = baseCollection.find();
 
@@ -135,7 +135,7 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
             reject(err);
           }
 
-          logger.debug("Returning rows:", docs.length);
+          logger.debug("Returning rows: " + docs.length);
           fulfill({ rows: docs, count: docs.length });
         });
       });
@@ -156,11 +156,11 @@ const mapCollectionMethods = (db, datasetName, rawTableName, indexes) => {
 
   if (getTableName(rawTableName) == rawTableName) {
     // If no variables in name, make a static mapping
-    logger.debug("Regular collection:", datasetName);
+    logger.debug("Regular collection: " + datasetName);
     db[datasetName] = genericCollection();
   } else {
     // otherwise make it a getter
-    logger.debug("Dynamic collection:", datasetName);
+    logger.debug("Dynamic collection: " + datasetName);
     db[datasetName] = genericCollection;
   }
 }
@@ -194,7 +194,7 @@ const associateModels = (db) => {
 
       var indexes = [];
       for (var index of model.options.indexes) {
-        logger.silly(datasetName + " index found:", index);
+        logger.silly(datasetName + " index found: " + index);
         const mappedIndex = index.fields.map((field) => {
           var indexField = {};
           indexField[field] = 1;
@@ -223,18 +223,18 @@ const connectToMongo = (callback) => {
     return;
   }
 
-  logger.info("Trying to connect:", connectionUrl);
-  mongoClient.connect(connectionUrl, function(err, mongoDatabase) {
+  logger.info("Trying to connect: " + connectionUrl);
+  mongoClient.connect(connectionUrl, function(err, client) {
     // Async could get us connected in the meantime so check again
     if (db == undefined) {
       assert.equal(null, err);
-      logger.info("Connected to server:", connectionUrl);
+      logger.info("Connected to server: " + connectionUrl);
 
-      db = mongoDatabase;
+      db = client.db();
       associateModels(db);
     } else {
       logger.silly("DB already opened, closing this request");
-      mongoDatabase.close()
+      client.close()
     }
 
     callback(db);
