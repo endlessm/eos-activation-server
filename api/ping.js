@@ -4,12 +4,12 @@
 const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
+const Validator = require('jsonschema').Validator;
+
 const pingConfigurationMapper = require('../util/ping_configuration_mapper');
 
 // Overridable on import of this module
 let db;
-
-const Validator = require('jsonschema').Validator;
 
 const ping = (router, logger) => {
   const validator = new Validator();
@@ -17,20 +17,38 @@ const ping = (router, logger) => {
   const ping_schema = {
     'type': 'object',
     'properties': {
-      'image':               { 'type': 'string' },
-      'vendor':              { 'type': 'string' },
-      'product':             { 'type': 'string' },
-      'release':             { 'type': 'string' },
-      'count':               { 'type': 'integer',
-                               'minimum': 0 },
-      'dualboot':            { 'type': 'boolean' },
-      'metrics_enabled':     { 'type': 'boolean' },
-      'metrics_environment': { 'type': 'string' },
+      'image': {
+        'type': 'string',
+      },
+      'vendor': {
+        'type': 'string',
+      },
+      'product': {
+        'type': 'string',
+      },
+      'release': {
+        'type': 'string',
+      },
+      'dualboot': {
+        'type': 'boolean',
+      },
+      'count': {
+        'type': 'integer',
+        'minimum': 0,
+      },
+      'metrics_enabled': {
+        'type': 'boolean',
+      },
+      'metrics_environment': {
+        'type': 'string',
+      },
     },
-    'required': ['image',
-                 'vendor',
-                 'product',
-                 'release']
+    'required': [
+      'image',
+      'vendor',
+      'product',
+      'release',
+    ]
   }
 
   const handleError = (res, err) => {
@@ -92,7 +110,6 @@ const ping = (router, logger) => {
         const validationResult = validator.validate(req.body, ping_schema)
         if (validationResult.errors.length > 0) {
           logger.warn("Request failed schema validation!");
-          logger.warn("Data: " + req.data);
 
           for (let errorMesage of validationResult.errors) {
             logger.debug(" - " + errorMesage);

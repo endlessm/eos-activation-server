@@ -35,7 +35,6 @@ describe('Activation (integration)', () => {
       logger.error(err);
 
       if (res) {
-        // logger.error(res);
         logger.error(res.status);
         logger.error(res.headers);
         logger.error(res.body);
@@ -220,9 +219,6 @@ describe('Activation (integration)', () => {
                   expect(activationRecord).to.have.property('city');
                   expect(activationRecord).to.have.property('latitude');
                   expect(activationRecord).to.have.property('longitude');
-                  expect(activationRecord).to.have.property('live');
-                  expect(activationRecord).to.have.property('dualboot');
-                  expect(activationRecord).to.have.property('mac_hash');
 
                   expect(isExpectedDate(new Date(activationRecord.createdAt))).to.equal(true);
                   expect(isExpectedDate(new Date(activationRecord.updatedAt))).to.equal(true);
@@ -231,9 +227,6 @@ describe('Activation (integration)', () => {
                   expect(activationRecord.city).to.equal('San Francisco');
                   expect(activationRecord.latitude).to.be.within(36, 38);
                   expect(activationRecord.longitude).to.be.within(-123, -121);
-                  expect(activationRecord.live).to.eql(live);
-                  expect(activationRecord.dualboot).to.eql(dualboot);
-                  expect(activationRecord.mac_hash).to.eql(mac_hash);
                 } catch(e) {
                   done()
                   logger.error(e);
@@ -264,43 +257,6 @@ describe('Activation (integration)', () => {
                 done();
               });
            });
-      });
-
-      xit('does not accept duplicate submissions of same serial', (done) => {
-        request(HOST)
-          .put('/v1/activate')
-          .set('X-Forwarded-For', '204.28.125.53')
-          .send(goodParams)
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .then((res) => {
-             expect(res.body.success).to.equal(true);
-
-             return request(HOST)
-               .put('/v1/activate')
-               .set('X-Forwarded-For', '204.28.125.53')
-               .send(goodParams)
-               .expect('Content-Type', /json/)
-               .expect(409);
-          })
-          .then((res) => {
-             db.Activation.findAndCountAll()
-               .then((result) => {
-                 expect(result.count).to.equal(1);
-                 expect(result.rows[0].serial).to.eql(serial);
-
-                 done();
-               })
-               .catch((err) => {
-                 errorHandler(err);
-
-                 done(err);
-               });
-          })
-          .catch((err, res) => {
-             errorHandler(err, res);
-             done(err);
-          });
       });
 
       it('handles duplicate submissions without creating duplicate records', (done) => {
