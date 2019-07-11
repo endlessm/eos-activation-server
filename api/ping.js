@@ -106,7 +106,6 @@ const ping = (router, logger) => {
         }
 
         ping.createdAt = new Date().toISOString();
-        ping.updatedAt = new Date().toISOString();
 
         // The 1 represents the API version ('/v1/' part of the URL)
         insertPingRecord(res, 1, ping);

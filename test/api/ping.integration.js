@@ -205,13 +205,11 @@ describe('Ping (integration)', () => {
                 }
 
                 expect(record).to.have.property('createdAt');
-                expect(record).to.have.property('updatedAt');
                 expect(record).to.have.property('country');
                 expect(record).not.to.have.property('metrics_enabled');
                 expect(record).not.to.have.property('metrics_environment');
 
                 expect(isExpectedDate(new Date(record.createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(record.updatedAt))).to.equal(true);
                 expect(record.country).to.equal('USA');
 
                 done();
@@ -305,9 +303,7 @@ describe('Ping (integration)', () => {
                 const record = JSON.parse(result[0]);
 
                 expect(record).to.have.property('createdAt');
-                expect(record).to.have.property('updatedAt');
                 expect(isExpectedDate(new Date(record.createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(record.updatedAt))).to.equal(true);
 
                 done();
               }).catch((err) => {
