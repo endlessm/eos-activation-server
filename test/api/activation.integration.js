@@ -211,14 +211,14 @@ describe('Activation (integration)', () => {
                   expect(record[prop]).to.eql(goodParams[prop]);
                 }
 
-                expect(record).to.have.property('createdAt');
+                expect(record).to.have.property('created_at');
                 expect(record).to.have.property('country');
                 expect(record).to.have.property('region');
                 expect(record).to.have.property('city');
                 expect(record).to.have.property('latitude');
                 expect(record).to.have.property('longitude');
 
-                expect(isExpectedDate(new Date(record.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
                 expect(record.country).to.equal('USA');
                 expect(record.region).to.equal('CA');
                 expect(record.city).to.equal('San Francisco');
@@ -383,9 +383,9 @@ describe('Activation (integration)', () => {
                 var timeAfterRequest = new Date();
                 timeAfterRequest.setMinutes(timeAfterRequest.getMinutes() + 1);
 
-                expect(record).to.have.property('createdAt');
+                expect(record).to.have.property('created_at');
 
-                expect(isExpectedDate(new Date(record.createdAt))).to.equal(true);
+                expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
 
                 done();
               });

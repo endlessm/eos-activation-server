@@ -116,7 +116,7 @@ const activation = (router, logger) => {
           }
         }
 
-        activation.createdAt = new Date().toISOString();
+        activation.created_at = new Date().toISOString();
 
         // The 1 represents the API version ('/v1/' part of the URL)
         insertActivationRecord(res, 1, activation);

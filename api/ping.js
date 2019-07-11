@@ -105,7 +105,7 @@ const ping = (router, logger) => {
           ping.country = countries.alpha2ToAlpha3(geoLookup.country);
         }
 
-        ping.createdAt = new Date().toISOString();
+        ping.created_at = new Date().toISOString();
 
         // The 1 represents the API version ('/v1/' part of the URL)
         insertPingRecord(res, 1, ping);
