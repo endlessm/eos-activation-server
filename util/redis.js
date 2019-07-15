@@ -3,19 +3,17 @@
 
 const Redis = require('ioredis');
 
-const redisHost = '172.17.0.1';
-const redisPort = 6379;
-const redisPassword = '';
+const config = require('../config');
 
 exports = module.exports = {
-  redisHost,
-  redisPort,
-  redisPassword,
+  redisHost: config.redis_host,
+  redisPort: config.redis_port,
+  redisPassword: config.redis_password,
   getRedis: (callback) => {
     const redis = new Redis({
-      port: redisPort,
-      host: redisHost,
-      password: redisPassword,
+      host: config.redis_host,
+      port: config.redis_port,
+      password: config.redis_password,
     });
 
     callback(redis);
