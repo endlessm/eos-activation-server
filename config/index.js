@@ -18,9 +18,9 @@ process.on('uncaughtException', (err) => {
 
 exports = module.exports = {
   env: process.env.NODE_ENV,
-  logger: logger,
-  server_port: server_port,
-  server_bind_address: server_bind_address,
+  logger,
+  server_port,
+  server_bind_address,
   redis_host,
   redis_port,
   redis_password,
