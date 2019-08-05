@@ -8,19 +8,19 @@ process.env.NODE_ENV = 'test';
 const chai = require('chai');
 chai.use(require('chai-datetime'));
 
-const dbDriver = require('../../db');
-
 const expect = require('chai').expect;
 const request = require('supertest');
 
-let db;
+const redisBackend = require('../../util/redis').getRedis;
 
 const logger = require('../../util').logger;
 
+let redis;
+
 describe('Ping (integration)', () => {
   before((done) => {
-    dbDriver((database) => {
-      db = database;
+    redisBackend((redisClient) => {
+      redis = redisClient;
       done();
     });
   });
@@ -28,8 +28,6 @@ describe('Ping (integration)', () => {
   const HOST = 'localhost:3030';
 
   let goodParams;
-  let configurationFields;
-  let pingFields;
 
   const errorHandler = (err, res) => {
     if (err) {
@@ -174,23 +172,14 @@ describe('Ping (integration)', () => {
       const dualboot = [undefined, false, true][Math.floor(Math.random() * Math.floor(3))];
 
       beforeEach((done) => {
-        configurationFields = ['image',
-                               'vendor',
-                               'product' ];
-
-        pingFields = ['country',
-                      'count' ];
-
         goodParams = { image: image,
                        vendor: vendor,
                        product: product,
                        release: release,
                        dualboot: dualboot };
 
-        db.Ping().sync({ force : true }).then(() => {
-          db.Configuration.sync({ force : true }).then(() => {
-            done();
-          });
+        redis.del('ping-1').then(() => {
+          done();
         });
       });
 
@@ -206,55 +195,24 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Configuration.findAndCountAll().then((configurations) => {
-                expect(configurations.count).to.equal(1);
-                const configuration = configurations.rows[0];
+              logger.error("Finding matching records...");
+              redis.lrange('ping-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
 
-                expect(configuration).to.have.property('createdAt');
-                expect(configuration).to.have.property('updatedAt');
-                expect(isExpectedDate(new Date(configuration.createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(configuration.updatedAt))).to.equal(true);
-
-                expect(configuration).to.have.property('image');
-                expect(configuration).to.have.property('vendor');
-                expect(configuration).to.have.property('product');
-
-                for (let prop in configurationFields) {
-                  expect(configuration[prop]).to.eql(goodParams[prop]);
-                }
-                if (dualboot) {
-                  expect(configuration.dualboot).to.eql(dualboot);
-                } else {
-                  expect(configuration).not.to.have.property('dualboot')
+                const record = JSON.parse(result[0]);
+                for (let prop in goodParams) {
+                  expect(record[prop]).to.eql(goodParams[prop]);
                 }
 
-                db.Ping().findAndCountAll().then((result) => {
-                  expect(result.count).to.equal(1);
+                expect(record).to.have.property('created_at');
+                expect(record).to.have.property('country');
+                expect(record).not.to.have.property('metrics_enabled');
+                expect(record).not.to.have.property('metrics_environment');
 
-                  const pingRecord = result.rows[0];
+                expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
+                expect(record.country).to.equal('USA');
 
-                  expect(pingRecord).to.have.property('createdAt');
-                  expect(pingRecord).to.have.property('updatedAt');
-                  expect(pingRecord).to.have.property('count');
-                  expect(pingRecord).to.have.property('country');
-                  expect(pingRecord).to.have.property('release');
-                  expect(pingRecord).to.have.property('config_id');
-                  expect(pingRecord).to.have.property('dualboot');
-
-                  expect(pingRecord.country).to.equal('USA');
-                  expect(pingRecord.count).to.equal(0);
-                  expect(pingRecord.config_id).to.eql(configuration._id);
-                  expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
-                  expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
-
-                  expect(pingRecord).not.to.have.property('metrics_enabled');
-                  expect(pingRecord).not.to.have.property('metrics_environment');
-
-                  done();
-                })
-                .catch((err) => {
-                  done(err);
-                });
+                done();
               }).catch((err) => {
                 done(err);
               });
@@ -273,9 +231,11 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Ping().findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
-                expect(result.rows[0].country).to.eql('USA');
+              redis.lrange('ping-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+
+                const record = JSON.parse(result[0]);
+                expect(record.country).to.eql('USA');
 
                 done();
               })
@@ -285,7 +245,7 @@ describe('Ping (integration)', () => {
            });
       });
 
-      it('handles duplicates', (done) => {
+      it('handles duplicate submissions', (done) => {
         request(HOST)
           .put('/v1/ping')
           .set('X-Forwarded-For', '204.28.125.53')
@@ -303,11 +263,14 @@ describe('Ping (integration)', () => {
                .expect(200);
           })
           .then((res) => {
-             db.Ping().findAndCountAll()
+             redis.lrange('ping-1', 0, -1)
                .then((result) => {
-                 expect(result.count).to.equal(2);
-                 expect(result.rows[0].release).to.eql(release);
-                 expect(result.rows[1].release).to.eql(release);
+                 expect(result.length).to.equal(2);
+
+                 for (let i = 0; i < result.length; i++) {
+                   const record = JSON.parse(result[i]);
+                   expect(record.release).to.eql(release);
+                 }
 
                  done();
                })
@@ -335,31 +298,14 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Configuration.findAndCountAll().then((configurations) => {
-                expect(configurations.count).to.equal(1);
-                const configuration = configurations.rows[0];
+              redis.lrange('ping-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+                const record = JSON.parse(result[0]);
 
-                expect(configuration).to.have.property('createdAt');
-                expect(configuration).to.have.property('updatedAt');
-                expect(isExpectedDate(new Date(configuration.createdAt))).to.equal(true);
-                expect(isExpectedDate(new Date(configuration.updatedAt))).to.equal(true);
+                expect(record).to.have.property('created_at');
+                expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
 
-                db.Ping().findAndCountAll().then((result) => {
-                  expect(result.count).to.equal(1);
-
-                  const pingRecord = result.rows[0];
-
-                  expect(pingRecord).to.have.property('createdAt');
-                  expect(pingRecord).to.have.property('updatedAt');
-
-                  expect(isExpectedDate(new Date(pingRecord.createdAt))).to.equal(true);
-                  expect(isExpectedDate(new Date(pingRecord.updatedAt))).to.equal(true);
-
-                  done();
-                })
-                .catch((err) => {
-                  done(err);
-                });
+                done();
               }).catch((err) => {
                 done(err);
               });
@@ -380,9 +326,10 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Ping().findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
-                expect(result.rows[0].count).to.eql(123);
+              redis.lrange('ping-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+                const record = JSON.parse(result[0]);
+                expect(record.count).to.eql(123);
 
                 done();
               })
@@ -407,10 +354,12 @@ describe('Ping (integration)', () => {
 
               expect(res.body.success).to.equal(true);
 
-              db.Ping().findAndCountAll().then((result) => {
-                expect(result.count).to.equal(1);
-                expect(result.rows[0].metrics_enabled).to.eql(true);
-                expect(result.rows[0].metrics_environment).to.eql("production");
+              redis.lrange('ping-1', 0, -1).then((result) => {
+                expect(result.length).to.equal(1);
+                const record = JSON.parse(result[0]);
+
+                expect(record.metrics_enabled).to.eql(true);
+                expect(record.metrics_environment).to.eql("production");
 
                 done();
               })
@@ -419,7 +368,6 @@ describe('Ping (integration)', () => {
               });
            });
       });
-
     });
   });
 });

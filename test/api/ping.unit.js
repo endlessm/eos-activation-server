@@ -9,18 +9,18 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
-const dbDriver = require('../../db');
+const redisBackend = require('../../util/redis').getRedis;
 
 const logger = require('../../util').logger;
 
 const helpers = require('../util/unit_test_helpers');
 
-let db;
+let redis;
 
 describe('Ping (unit)', () => {
   before((done) => {
-    dbDriver((database) => {
-      db = database;
+    redisBackend((redisClient) => {
+      redis = redisClient;
       done();
     });
   });
@@ -30,8 +30,9 @@ describe('Ping (unit)', () => {
   let goodParams;
 
   const testHandler = (params, options, done, testCallback) => {
-    helpers.invokeHandler(testClass, db, params, options).then((response) => {
+    helpers.invokeHandler(testClass, redis, params, options).then((response) => {
       testCallback(response);
+
       done();
     })
     .catch(done);
@@ -57,7 +58,7 @@ describe('Ping (unit)', () => {
           }
         }
 
-        const testInstance = testClass(mockRouter, db, logger);
+        const testInstance = testClass(mockRouter, redis, logger);
       });
     });
 
@@ -210,12 +211,6 @@ describe('Ping (unit)', () => {
           expect(response.body.success).to.be.eql(true);
           expect(response.status).to.be.equal(200);
         });
-      });
-    });
-
-    describe('data persistence', ()  => {
-      xit('works', (done) => {
-        throw new Error('!! Covered already by integration tests !!');
       });
     });
   });
