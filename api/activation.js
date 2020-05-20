@@ -1,7 +1,6 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const countries = require("i18n-iso-countries");
 const express = require('express');
 const geoip = require('geoip-lite');
 const Validator = require('jsonschema').Validator;
@@ -105,8 +104,7 @@ const activation = (router, logger) => {
         if (geoLookup) {
           logger.info('Geo: ' + geoLookup);
 
-          // Store 3-letter code vs 2-letter one since vendor wants it that way
-          activation.country = countries.alpha2ToAlpha3(geoLookup.country);
+          activation.country = geoLookup.country;
           activation.region = geoLookup.region;
           activation.city = geoLookup.city;
 

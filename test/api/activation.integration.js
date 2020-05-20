@@ -219,7 +219,7 @@ describe('Activation (integration)', () => {
                 expect(record).to.have.property('longitude');
 
                 expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
-                expect(record.country).to.equal('USA');
+                expect(record.country).to.equal('US');
                 expect(record.region).to.equal('CA');
                 expect(record.city).to.equal('San Francisco');
                 expect(record.latitude).to.be.within(36, 38);
@@ -227,32 +227,6 @@ describe('Activation (integration)', () => {
 
                 done();
               }).catch((err) => {
-                done(err);
-              });
-           });
-      });
-
-      it('saves the 3-letter country code instead of the 2-letter one', (done) => {
-        request(HOST)
-          .put('/v1/activate')
-          .set('X-Forwarded-For', '204.28.125.53')
-          .send(goodParams)
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end((err, res) => {
-              errorHandler(err, res);
-
-              expect(res.body.success).to.equal(true);
-
-              redis.lrange('activation-1', 0, -1).then((result) => {
-                expect(result.length).to.equal(1);
-
-                const record = JSON.parse(result[0]);
-                expect(record.country).to.eql('USA');
-
-                done();
-              })
-              .catch((err) => {
                 done(err);
               });
            });
