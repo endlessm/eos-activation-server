@@ -1,5 +1,0 @@
-# Hosts file for deploying to a VM
-# XXX: Using both old and new syntax for defining the username
-
-[development_vms]
-vm-test ansible_ssh_user=dev1 ansible_user=dev1

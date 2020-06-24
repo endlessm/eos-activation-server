@@ -1,6 +1,0 @@
----
-aws_region: us-west-2
-server_key: eos-activation-service
-
-# Test setup - Uncomment to use
-# server_elastic_ip: 54.68.7.35
