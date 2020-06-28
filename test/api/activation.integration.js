@@ -25,7 +25,7 @@ describe('Activation (integration)', () => {
     });
   });
 
-  const HOST = 'localhost:3030';
+  const HOST = 'localhost:3000';
 
   let goodParams;
 
