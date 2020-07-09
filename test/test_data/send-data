@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import logging
+import pathlib
+import sys
+import urllib.request
+
+HOST = "localhost"
+PORT = "80"
+TYPE = "all"
+
+
+def send_data(payload, endpoint):
+    logging.info(f"Posting {payload} to {endpoint}.")
+    data = payload.read_bytes()
+    request = urllib.request.Request(endpoint, data, method="PUT")
+    request.add_header("Content-Type", "application/json")
+    try:
+        response = urllib.request.urlopen(request)
+    except Exception as e:
+        logging.error(f"Posting {payload} failed: {str(e)}")
+        sys.exit(1)
+    code = response.getcode()
+    if code != 200:
+        logging.error(f"Posting {payload} returned code {code}.")
+        sys.exit(1)
+    try:
+        success = json.loads(response.read())["success"]
+    except Exception:
+        logging.error(f"Posting {payload} did not succeed.")
+        sys.exit(1)
+    if not success:
+        logging.error(f"Posting {payload} did not succeed.")
+        sys.exit(1)
+    logging.info(f"Posting {payload} to {endpoint} succeeded.")
+
+
+def send_pings(host, port, protocol):
+    endpoint = f"{protocol}://{host}:{port}/v1/ping"
+    files = list(pathlib.Path(".").glob("test_ping_data*.json"))
+    if len(files) == 0:
+        logging.error("Did not find ping data files.")
+        sys.exit(1)
+    for payload in files:
+        send_data(payload=payload, endpoint=endpoint)
+
+
+def send_activations(host, port, protocol):
+    endpoint = f"{protocol}://{host}:{port}/v1/activate"
+    files = list(pathlib.Path(".").glob("test_activation_data*.json"))
+    if len(files) == 0:
+        logging.error("Did not find activation data files.")
+        sys.exit(1)
+    for payload in files:
+        send_data(payload=payload, endpoint=endpoint)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Send test data to the server.")
+    parser.add_argument(
+        "-H",
+        "--host",
+        help=f"Hostname to send data to (defaults to {HOST})",
+        default=HOST,
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        help=f"Port to send data to (defaults to {PORT})",
+        default=PORT,
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Increase output verbosity",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-s",
+        "--secure",
+        help="Use a secure connection (https instead of http).",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-t",
+        "--type",
+        help=f"Type of data to send (defaults to {TYPE}).",
+        default=TYPE,
+        choices=["all", "ping", "activation"],
+    )
+    args = parser.parse_args()
+    protocol = "https" if args.secure else "http"
+    log_level = logging.INFO if args.verbose else logging.WARN
+    logging.basicConfig(format="%(message)s", level=log_level)
+    if args.type in ["all", "activation"]:
+        send_activations(host=args.host, port=args.port, protocol=protocol)
+    if args.type in ["all", "ping"]:
+        send_pings(host=args.host, port=args.port, protocol=protocol)
+    logging.info("Data sent successfully.")
+    sys.exit(0)
