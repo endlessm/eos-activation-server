@@ -1,5 +1,5 @@
 {
-  "image": "eos-eos3.3-amd64-amd64.foo-bar.base",
+  "image": "eos-eos3.7-amd64-amd64.190419-225606.base",
   "product": "product",
   "release": "3.1.10",
   "vendor": "vendor",
