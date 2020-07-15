@@ -210,36 +210,10 @@ describe('Ping (integration)', () => {
                 expect(record).not.to.have.property('metrics_environment');
 
                 expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
-                expect(record.country).to.equal('USA');
+                expect(record.country).to.equal('US');
 
                 done();
               }).catch((err) => {
-                done(err);
-              });
-           });
-      });
-
-      it('saves the 3-letter country code instead of the 2-letter one', (done) => {
-        request(HOST)
-          .put('/v1/ping')
-          .set('X-Forwarded-For', '204.28.125.53')
-          .send(goodParams)
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end((err, res) => {
-              errorHandler(err, res);
-
-              expect(res.body.success).to.equal(true);
-
-              redis.lrange('ping-1', 0, -1).then((result) => {
-                expect(result.length).to.equal(1);
-
-                const record = JSON.parse(result[0]);
-                expect(record.country).to.eql('USA');
-
-                done();
-              })
-              .catch((err) => {
                 done(err);
               });
            });
