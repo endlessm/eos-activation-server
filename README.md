@@ -34,10 +34,17 @@ Server that logs all activation pings by the clients in the database and sends s
 
 * Install and start Redis
 * Install Node and NPM
-* Run `npm install`
-* Run `npm test`
+* Run `NODE_ENV=test npm install`
+* Run `npm start`
+* In another window run `npm test`
 
 ### Docker-based development and testing
+
+You can use use Docker and run and test the project. Because the
+`eos-activation-server-vendor-signer` submodule is needed but it's a private repo
+you need to create a personal access token (follow the instructions at
+https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+and select the `repo` scope).
 
 To test your changes in a reproducible environment, you can do the following:
 
@@ -51,11 +58,17 @@ To test your changes in a reproducible environment, you can do the following:
 2.  Build the test image:
 
     ```
-    $ docker build --tag=test-eos-activation-server --file Dockerfile.test .
+    $ docker build --build-arg GITHUB_TOKEN=<INSERT TOKEN HERE> --tag=eos-activation-server .
     ```
 
-3.  Run the tests:
+3. Start the server:
 
     ```
-    $ docker run --tty --interactive --network=host test-eos-activation-server npm test
+    $ docker run --network=host --rm --name=eos-activation-server eos-activation-server
+    ```
+
+4.  Run the tests (in a different window):
+
+    ```
+    $ docker exec --tty --interactive eos-activation-server npm test
     ```

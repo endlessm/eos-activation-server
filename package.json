@@ -4,8 +4,8 @@
   "description": "Server for management of activation requests",
   "main": "app.js",
   "scripts": {
-    "start": "node --trace-sync-io app.js",
-    "test": "./run_tests.sh"
+    "start": "node app.js",
+    "test": "./node_modules/.bin/mocha --recursive --check-leaks --exit"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,6 @@
     "i18n-iso-countries": "^4.2.0",
     "ioredis": "^4.11.1",
     "jsonschema": "^1.1.0",
-    "pm2": "^3.5.0",
     "soap": "^0.28.0",
     "uuid": "^3.0.1",
     "winston": "^3.2.1"
