@@ -185,36 +185,6 @@ describe('Activation (unit)', () => {
       });
     });
 
-    describe('hooks', () => {
-      it('are invoked correctly', (done) => {
-        let hook = (record) => {
-          expect(record).to.be.not.equal(undefined);
-
-          for (let prop in goodParams) {
-            expect(record).to.have.property(prop);
-            expect(record[prop]).to.be.eql(goodParams[prop]);
-          }
-        }
-
-        testHandler(goodParams, { hook: hook }, done, (response) => {
-          expect(response.body.success).to.be.eql(true);
-          expect(response.status).to.be.equal(200);
-        });
-      });
-
-      it("aren't invoked when data is bad", (done) => {
-        delete goodParams.image;
-        let hook = (record) => {
-          done(new Error('Should not have gotten here'));
-        }
-
-        testHandler(goodParams, { hook: hook }, done, (response) => {
-          // Sanity check
-          expect(response.body.success).to.not.be.eql(true);
-        });
-      });
-    });
-
     describe('geolocation', ()  => {
       it('should not fail if geolocation is unknown', (done) => {
         testHandler(goodParams, { ip: '127.0.0.1' }, done, (response) => {

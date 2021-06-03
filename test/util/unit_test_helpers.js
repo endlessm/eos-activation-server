@@ -9,7 +9,6 @@ var helpers = {};
 
 helpers.getHandler = (testClass, db, options) => {
   let handler;
-  let hook;
 
   let mockRouter = {
     routes: {},
@@ -18,12 +17,7 @@ helpers.getHandler = (testClass, db, options) => {
     }
   }
 
-  if (options && options.hook) {
-    logger.debug("Attaching test hook to ping class");
-    hook = options.hook;
-  }
-
-  const testInstance = testClass(mockRouter, db, logger, hook);
+  const testInstance = testClass(mockRouter, db, logger);
 
   // Sanity check
   expect(handler).to.be.not.equal(undefined);
