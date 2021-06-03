@@ -1,0 +1,43 @@
+name: EOS Activation Server Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker Image
+        run: docker build --tag=eos-activation-server .
+      - name: Save Docker Image
+        run: docker save eos-activation-server > docker-image.tar
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image
+          path: docker-image.tar
+
+  tests:
+    name: Integration Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Docker Image
+        uses: actions/download-artifact@v2
+        with:
+          name: image
+      - name: Load Docker Image
+        run: docker load < docker-image.tar
+      - name: Install Docker Images
+        run: docker run -d --name=redis --network=host redis:5-alpine
+      - name: Run Server
+        run: docker run -d --name=server --network=host --rm --name=eos-activation-server eos-activation-server
+      - name: Run Tests
+        run: docker run --rm --network=host eos-activation-server npm test
+      - name: Remove Docker Images
+        run: docker rm -f redis server
