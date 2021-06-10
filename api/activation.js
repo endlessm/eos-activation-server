@@ -7,7 +7,6 @@ const Validator = require('jsonschema').Validator;
 
 // Overridable on import of this module
 let redis;
-let hooksHandler;
 
 const activation = (router, logger) => {
   const validator = new Validator();
@@ -57,8 +56,6 @@ const activation = (router, logger) => {
     redis.lpush(`activation-${version}`, recordSerialized)
                  .then((changed) => {
       logger.info('Activation saved: ' + recordSerialized);
-
-      hooksHandler(record);
 
       res.status(200)
          .json({ success: true });
@@ -130,17 +127,7 @@ const activation = (router, logger) => {
   return router;
 }
 
-// Allows injection of hook handler
-exports = module.exports = (router, redisClient, logger, handler) => {
-  if (handler) {
-    logger.warn('Activation hook handler overriden!');
-    hooksHandler = handler;
-  } else {
-    logger.debug('Using default activation hook handler');
-    hooksHandler = require('../activation_hooks');
-  }
-
+exports = module.exports = (router, redisClient, logger) => {
   redis = redisClient;
-
   return activation(router, logger);
 };

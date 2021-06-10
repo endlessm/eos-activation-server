@@ -1,6 +1,8 @@
 # eos-activation-server
 
-Server that logs all activation pings by the clients in the database and sends separate activation data to vendor server as well.
+Server that receives activations and pings submitted by Endless OS clients
+running [eos-phone-home](https://github.com/endlessm/eos-phone-home) and queues
+them for consumption by [azafea](https://github.com/endlessm/azafea).
 
 ## Activation endpoint
 
@@ -40,11 +42,7 @@ Server that logs all activation pings by the clients in the database and sends s
 
 ### Docker-based development and testing
 
-You can use use Docker and run and test the project. Because the
-`eos-activation-server-vendor-signer` submodule is needed but it's a private repo
-you need to create a personal access token (follow the instructions at
-https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
-and select the `repo` scope).
+You can use Docker to run and test the project.
 
 To test your changes in a reproducible environment, you can do the following:
 
@@ -58,7 +56,7 @@ To test your changes in a reproducible environment, you can do the following:
 2.  Build the test image:
 
     ```
-    $ docker build --build-arg GITHUB_TOKEN=<INSERT TOKEN HERE> --tag=eos-activation-server .
+    $ docker build --tag=eos-activation-server .
     ```
 
 3. Start the server:
