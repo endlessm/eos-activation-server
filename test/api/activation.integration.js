@@ -213,17 +213,13 @@ describe('Activation (integration)', () => {
 
                 expect(record).to.have.property('created_at');
                 expect(record).to.have.property('country');
-                expect(record).to.have.property('region');
-                expect(record).to.have.property('city');
                 expect(record).to.have.property('latitude');
                 expect(record).to.have.property('longitude');
 
                 expect(isExpectedDate(new Date(record.created_at))).to.equal(true);
                 expect(record.country).to.equal('US');
-                expect(record.region).to.equal('CA');
-                expect(record.city).to.equal('San Francisco');
-                expect(record.latitude).to.be.within(36, 38);
-                expect(record.longitude).to.be.within(-123, -121);
+                expect(record.latitude).to.equal(37.5);
+                expect(record.longitude).to.equal(-122.5);
 
                 done();
               }).catch((err) => {
