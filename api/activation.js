@@ -99,15 +99,11 @@ const activation = (router, logger) => {
 
         const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
-          logger.info('Geo: ' + geoLookup);
-
           activation.country = geoLookup.country;
-          activation.region = geoLookup.region;
-          activation.city = geoLookup.city;
 
           if (geoLookup.ll) {
-            activation.latitude = geoLookup.ll[0];
-            activation.longitude = geoLookup.ll[1];
+            activation.latitude = Math.min(Math.floor(geoLookup.ll[0]) + 0.5, 89.5);
+            activation.longitude = Math.min(Math.floor(geoLookup.ll[1]) + 0.5, 189.5);
           }
         }
 
