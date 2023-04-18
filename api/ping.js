@@ -98,8 +98,6 @@ const ping = (router, logger) => {
 
         const geoLookup = geoip.lookup(ip);
         if (geoLookup) {
-          logger.info('Geo: ' + geoLookup);
-
           ping.country = geoLookup.country;
         }
 
