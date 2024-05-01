@@ -7,40 +7,62 @@ on:
     branches:
       - master
   pull_request:
+  workflow_dispatch:
+
+env:
+  IMAGE: endlessm/eos-activation-server
 
 jobs:
   build:
-    name: Build Docker Image
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Docker Image
-        run: docker build --tag=eos-activation-server .
-      - name: Save Docker Image
-        run: docker save eos-activation-server > docker-image.tar
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: image
-          path: docker-image.tar
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  tests:
-    name: Integration Tests
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Get Docker Image
-        uses: actions/download-artifact@v2
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
         with:
-          name: image
-      - name: Load Docker Image
-        run: docker load < docker-image.tar
-      - name: Install Docker Images
-        run: docker run -d --name=redis --network=host redis:5-alpine
-      - name: Run Server
-        run: docker run -d --name=server --network=host --rm --name=eos-activation-server eos-activation-server
-      - name: Run Tests
-        run: docker run --rm --network=host eos-activation-server npm test
-      - name: Remove Docker Images
-        run: docker rm -f redis server
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and export to Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          pull: true
+          tags: test-server:latest
+
+      - name: Run Redis
+        run: docker run -d --rm --network=host --name=redis redis:5-alpine
+
+      - name: Run server
+        run: docker run -d --rm --network=host --name=server test-server:latest
+
+      - name: Run tests
+        run: docker run --rm --network=host test-server:latest npm test
+
+      - name: Stop server
+        run: docker stop server
+
+      - name: Stop Redis
+        run: docker stop redis
+
+      - name: Build and push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ github.ref == 'refs/heads/master' }}
+          tags: ${{ steps.meta.outputs.tags }}
