@@ -11,22 +11,18 @@
     "type": "git",
     "url": "git+https://github.com/endlessm/eos-activation-server.git"
   },
-  "author": "Srdjan Grubor <sgnn7@sgnn7.org>",
-  "license": "LGPL-2.1",
+  "author": "Endless OS Maintainers <maintainers@endlessos.org>",
+  "license": "GPL-2.0-or-later",
   "bugs": {
     "url": "https://github.com/endlessm/eos-activation-server/issues"
   },
   "homepage": "https://github.com/endlessm/eos-activation-server",
   "dependencies": {
     "body-parser": "^1.17.1",
-    "bull": "^3.9.1",
     "express": "^4.15.2",
     "geoip-lite": "^1.2.0",
-    "i18n-iso-countries": "^4.2.0",
     "ioredis": "^4.11.1",
     "jsonschema": "^1.1.0",
-    "soap": "^0.28.0",
-    "uuid": "^3.0.1",
     "winston": "^3.2.1"
   },
   "devDependencies": {
