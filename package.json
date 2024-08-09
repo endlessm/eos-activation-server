@@ -12,7 +12,7 @@
     "url": "git+https://github.com/endlessm/eos-activation-server.git"
   },
   "author": "Endless OS Maintainers <maintainers@endlessos.org>",
-  "license": "LGPL-2.1",
+  "license": "GPL-2.0-or-later",
   "bugs": {
     "url": "https://github.com/endlessm/eos-activation-server/issues"
   },
