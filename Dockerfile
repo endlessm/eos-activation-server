@@ -1,7 +1,7 @@
 # Copyright © 2016-2024 Endless OS Foundation LLC
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-FROM node:10-buster-slim
+FROM node:22-bookworm-slim
 
 # Make sure ca-certificates is installed so TLS connections can be made.
 RUN export DEBIAN_FRONTEND=noninteractive && \
