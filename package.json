@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/endlessm/eos-activation-server.git"
   },
-  "author": "Srdjan Grubor <sgnn7@sgnn7.org>",
+  "author": "Endless OS Maintainers <maintainers@endlessos.org>",
   "license": "LGPL-2.1",
   "bugs": {
     "url": "https://github.com/endlessm/eos-activation-server/issues"
