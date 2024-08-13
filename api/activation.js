@@ -67,8 +67,6 @@ const activation = (router, logger) => {
       res.status(500)
          .json({ error: err.toString(),
                  success: false });
-
-      throw err;
     });
   }
 
