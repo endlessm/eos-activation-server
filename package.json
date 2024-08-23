@@ -28,7 +28,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-datetime": "^1.4.1",
-    "mocha": "^6.1.4",
+    "mocha": "^10.7.3",
     "mocha-jenkins-reporter": "^0.4.1",
     "sinon": "^7.3.2",
     "supertest": "^4.0.2"
