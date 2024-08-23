@@ -3,7 +3,6 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const express = require('express');
 const geoip = require('geoip-lite');
 const Validator = require('jsonschema').Validator;
 
