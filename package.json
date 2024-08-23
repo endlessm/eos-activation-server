@@ -31,6 +31,6 @@
     "mocha": "^10.7.3",
     "mocha-jenkins-reporter": "^0.4.1",
     "sinon": "^7.3.2",
-    "supertest": "^4.0.2"
+    "supertest": "^7.0.0"
   }
 }
