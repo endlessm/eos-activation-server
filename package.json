@@ -29,7 +29,6 @@
     "chai": "^4.2.0",
     "chai-datetime": "^1.4.1",
     "mocha": "^10.7.3",
-    "mocha-jenkins-reporter": "^0.4.1",
     "supertest": "^7.0.0"
   }
 }
