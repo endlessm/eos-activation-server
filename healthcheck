@@ -8,7 +8,7 @@ var http = require("http");
 var options = {
     host     : config.server_bind_address,
     method   : "GET",
-    path     : "/",
+    path     : "/health",
     port     :  config.server_port,
     timeout  : 5,
 };
@@ -24,7 +24,7 @@ var request = http.request(options, (res) => {
 });
 
 request.on('error', function(err) {
-    console.log('ERROR');
+    console.log('ERROR: %s', err);
     process.exit(1);
 });
 

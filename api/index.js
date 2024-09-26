@@ -9,6 +9,7 @@ const config = require('../config');
 
 const activation = require('./activation');
 const ping = require('./ping');
+const health = require('./health');
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ const redisBackend = require('../util/redis').getRedis;
 redisBackend((redis) => {
   activation(router, redis, config.logger);
   ping(router, redis, config.logger);
+  health(router, redis, config.logger);
 });
 
 exports = module.exports = {
