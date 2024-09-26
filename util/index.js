@@ -3,11 +3,11 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const winston = require('winston');
+import winston from 'winston';
 
 const loggingLevel = process.env.NODE_ENV == 'test' ? 'debug'
                                                     : 'info';
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
       level: loggingLevel,
@@ -21,7 +21,3 @@ const logger = winston.createLogger({
     })
   ]
 });
-
-exports = module.exports = {
-  logger: logger
-}

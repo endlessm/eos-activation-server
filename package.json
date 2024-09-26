@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Server for management of activation requests",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "node app.js",
     "test": "./node_modules/.bin/mocha --recursive --check-leaks --exit"

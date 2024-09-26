@@ -3,11 +3,11 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const bodyParser = require('body-parser');
-const express = require('express');
+import bodyParser from 'body-parser';
+import express from 'express'
 
-const api = require('./api');
-const config = require('./config');
+import * as api from './api/index.js';
+import config from './config/index.js';
 
 const app = express();
 const logger = config.logger;
