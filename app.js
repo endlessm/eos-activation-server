@@ -27,7 +27,7 @@ app.use(api.router);
 
 // Error handler
 app.use((err, req, res, next) => {
-  logger.error(err);
+  logger.error(`while handling ${req.method} ${req.url}: ${err}`);
 
   if (res.headersSent) {
     return next(err);

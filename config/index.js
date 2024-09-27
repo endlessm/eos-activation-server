@@ -14,7 +14,7 @@ const redis_password = process.env.REDIS_PASSWORD || '';
 
 // Crash handler
 process.on('uncaughtException', (err) => {
-  logger.error(err.stack);
+  logger.error(`Uncaught exception: ${err.stack}`);
   process.exit(1);
 });
 

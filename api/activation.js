@@ -61,7 +61,7 @@ const activation = (router, logger) => {
       res.status(200)
          .json({ success: true });
     }).catch((err) => {
-      logger.error(err);
+      logger.error('Failed to save activation: ' + err);
 
       res.status(500)
          .json({ error: err.toString(),
