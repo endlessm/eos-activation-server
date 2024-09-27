@@ -27,18 +27,20 @@ app.use(api.router);
 
 // Error handler
 app.use((err, req, res, next) => {
-  if (err) {
-    logger.error(err);
+  logger.error(err);
 
-    let errorMessage = "Server error";
-    if (process.env.NODE_ENV == 'test') {
-      errorMessage = err.toString() + '\n' + err.stack;
-    }
-
-    res.status(500)
-       .json({ error: errorMessage,
-               success: false });
+  if (res.headersSent) {
+    return next(err);
   }
+
+  let errorMessage = "Server error";
+  if (process.env.NODE_ENV == 'test') {
+    errorMessage = err.stack;
+  }
+
+  res.status(500)
+     .json({ error: errorMessage,
+             success: false });
 });
 
 logger.info('Server starting on ' +
