@@ -12,10 +12,16 @@ exports = module.exports = {
   redisPort: config.redis_port,
   redisPassword: config.redis_password,
   getRedis: (callback) => {
+    /* ioredis uses tls.connect() if the tls option is set, and passes it as
+     * additional options to tls.connect().
+     */
+    let tls = config.redis_tls ? {} : undefined;
+
     const redis = new Redis({
       host: config.redis_host,
       port: config.redis_port,
       password: config.redis_password,
+      tls,
       reconnectOnError(err) {
         /* Reconnect when ElastiCache has promoted some other node to primary & 
          * demoted the node we are connected to a replica.
