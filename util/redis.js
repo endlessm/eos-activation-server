@@ -42,6 +42,22 @@ exports = module.exports = {
       },
     });
 
+    redis.on('connect', () => {
+      config.logger.info('Connected to Redis server');
+    });
+    redis.on('ready', () => {
+      config.logger.info('Redis connection ready');
+    });
+    redis.on('reconnecting', (delay) => {
+      config.logger.info(`Reconnecting to ${config.redis_host}:${config.redis_port} in ${delay} ms`);
+    });
+    redis.on('close', () => {
+      config.logger.info('Disconnected from Redis server');
+    });
+    redis.on('error', (err) => {
+      config.logger.error('Error connecting to Redis server: ' + err);
+    });
+
     callback(redis);
   },
 };
