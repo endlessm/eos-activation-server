@@ -60,7 +60,7 @@ const ping = (router, logger) => {
       res.status(200)
          .json({ success: true });
     }).catch((err) => {
-      logger.error(err);
+      logger.error('Failed to save ping: ' + err);
 
       res.status(500)
          .json({ error: err.toString(),
