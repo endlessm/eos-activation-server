@@ -43,7 +43,7 @@ exports = module.exports = {
            * run (typically after 3 hours or after a network change) so it is
            * not imperative to retry on the server.
            */
-          return 2;
+          return 1;
         }
       },
     });
