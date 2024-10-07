@@ -21,7 +21,7 @@ const health = (router, logger) => {
   return router;
 }
 
-exports = module.exports = (router, redisClient, logger) => {
+export default (router, redisClient, logger) => {
   redis = redisClient;
 
   return health(router, logger);

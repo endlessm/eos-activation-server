@@ -7,15 +7,16 @@
 //      Upstream: https://github.com/mochajs/mocha/issues/185
 process.env.NODE_ENV = 'test';
 
-const chai = require('chai');
-chai.use(require('chai-datetime'));
+import * as chai from 'chai';
+import chaiDatetime from 'chai-datetime';
+chai.use(chaiDatetime);
+import { expect } from 'chai';
 
-const expect = require('chai').expect;
-const request = require('supertest');
+import request from 'supertest';
 
-const redisBackend = require('../../util/redis').getRedis;
+import { getRedis as redisBackend } from '../../util/redis.js';
 
-const logger = require('../../util').logger;
+import { logger } from '../../util/index.js';
 
 let redis;
 
