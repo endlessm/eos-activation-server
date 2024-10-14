@@ -3,13 +3,11 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
-const logger = require('../../util').logger;
+import { logger } from '../../util/index.js';
 
-var helpers = {};
-
-helpers.getHandler = (testClass, db, options) => {
+export function getHandler(testClass, db, options) {
   let handler;
 
   let mockRouter = {
@@ -29,11 +27,11 @@ helpers.getHandler = (testClass, db, options) => {
   return handler;
 }
 
-helpers.invokeHandler = (testClass, db, value, options) => {
+export function invokeHandler(testClass, db, value, options) {
   const context = this;
   const promise = new Promise((resolve, reject) => {
     logger.debug('Handler options: ' + JSON.stringify(options));
-    const handler = helpers.getHandler(testClass, db, options);
+    const handler = getHandler(testClass, db, options);
 
     expect(handler).to.be.not.equal(undefined);
 
@@ -92,5 +90,3 @@ helpers.invokeHandler = (testClass, db, value, options) => {
 
   return promise;
 }
-
-exports = module.exports = helpers;
