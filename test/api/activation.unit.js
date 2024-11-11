@@ -7,14 +7,15 @@
 //      Upstream: https://github.com/mochajs/mocha/issues/185
 process.env.NODE_ENV = 'test';
 
-const chai = require('chai');
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
-const redisBackend = require('../../util/redis').getRedis;
+import { getRedis as redisBackend } from '../../util/redis.js';
 
-const logger = require('../../util').logger;
+import { logger } from '../../util/index.js';
 
-const helpers = require('../util/unit_test_helpers');
+import * as helpers from '../util/unit_test_helpers.js';
+
+import testClass from '../../api/activation.js';
 
 let redis;
 
@@ -25,8 +26,6 @@ describe('Activation (unit)', () => {
       done();
     });
   });
-
-  const testClass = require('../../api/activation');
 
   let goodParams;
 

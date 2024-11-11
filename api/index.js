@@ -3,24 +3,20 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const express = require('express');
+import express from 'express';
 
-const config = require('../config');
+import config from '../config/index.js';
 
-const activation = require('./activation');
-const ping = require('./ping');
-const health = require('./health');
+import activation from './activation.js';
+import ping from './ping.js';
+import health from './health.js';
 
-const router = express.Router();
+export const router = express.Router();
 
-const redisBackend = require('../util/redis').getRedis;
+import { getRedis as redisBackend } from '../util/redis.js';
 
 redisBackend((redis) => {
   activation(router, redis, config.logger);
   ping(router, redis, config.logger);
   health(router, redis, config.logger);
 });
-
-exports = module.exports = {
-  router: router
-};

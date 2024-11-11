@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Server for management of activation requests",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "node app.js",
     "test": "./node_modules/.bin/mocha --recursive --check-leaks --exit"
@@ -26,7 +27,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
+    "chai": "^5.1.1",
     "chai-datetime": "^1.8.1",
     "mocha": "^10.8.2",
     "supertest": "^7.0.0"

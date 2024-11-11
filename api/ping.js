@@ -3,8 +3,8 @@
 // vim: ts=2 sw=2 expandtab
 'use strict';
 
-const geoip = require('geoip-lite');
-const Validator = require('jsonschema').Validator;
+import geoip from 'geoip-lite';
+import { Validator } from 'jsonschema';
 
 // Overridable on import of this module
 let redis;
@@ -116,7 +116,7 @@ const ping = (router, logger) => {
   return router;
 }
 
-exports = module.exports = (router, redisClient, logger) => {
+export default (router, redisClient, logger) => {
   redis = redisClient;
 
   return ping(router, logger);
